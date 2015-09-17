@@ -601,8 +601,6 @@ enum {
 #define EXT4_ENCRYPTION_MODE_AES_256_CBC	3
 #define EXT4_ENCRYPTION_MODE_AES_256_CTS	4
 
-#include "ext4_crypto.h"
-
 /*
  * ioctl commands
  */
