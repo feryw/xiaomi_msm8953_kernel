@@ -3489,7 +3489,7 @@ static int ext4_block_zero_page_range(handle_t *handle,
 			/* We expect the key to be set. */
 			BUG_ON(!ext4_has_encryption_key(inode));
 			BUG_ON(blocksize != PAGE_CACHE_SIZE);
-			WARN_ON_ONCE(ext4_decrypt(page));
+			WARN_ON_ONCE(ext4_decrypt_one(inode, page));
 		}
 	}
 	if (ext4_should_journal_data(inode)) {
