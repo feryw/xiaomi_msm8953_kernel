@@ -3221,25 +3221,11 @@ static int ext4_symlink(struct inode *dir,
 	disk_link.len = len + 1;
 	disk_link.name = (char *) symname;
 
-	encryption_required = (ext4_encrypted_inode(dir) ||
-			       DUMMY_ENCRYPTION_ENABLED(EXT4_SB(dir->i_sb)));
-	if (encryption_required) {
-		err = ext4_get_encryption_info(dir);
-		if (err)
-			return err;
-		if (ext4_encryption_info(dir) == NULL)
-			return -EPERM;
-		disk_link.len = (ext4_fname_encrypted_size(dir, len) +
-				 sizeof(struct ext4_encrypted_symlink_data));
-		sd = kzalloc(disk_link.len, GFP_KERNEL);
-		if (!sd)
-			return -ENOMEM;
-	}
-
-	if (disk_link.len > dir->i_sb->s_blocksize) {
-		err = -ENAMETOOLONG;
-		goto err_free_sd;
-	}
+	encryption_required = ext4_encrypted_inode(dir);
+	if (encryption_required)
+		disk_link.len = encrypted_symlink_data_len(len) + 1;
+	if (disk_link.len > dir->i_sb->s_blocksize)
+		return -ENAMETOOLONG;
 
 	dquot_initialize(dir);
 
@@ -3270,19 +3256,34 @@ static int ext4_symlink(struct inode *dir,
 	if (IS_ERR(inode)) {
 		if (handle)
 			ext4_journal_stop(handle);
-		err = PTR_ERR(inode);
-		goto err_free_sd;
+		return PTR_ERR(inode);
 	}
 
 	if (encryption_required) {
+		struct ext4_fname_crypto_ctx *ctx = NULL;
 		struct qstr istr;
 		struct ext4_str ostr;
 
+		sd = kzalloc(disk_link.len, GFP_NOFS);
+		if (!sd) {
+			err = -ENOMEM;
+			goto err_drop_inode;
+		}
+		err = ext4_inherit_context(dir, inode);
+		if (err)
+			goto err_drop_inode;
+		ctx = ext4_get_fname_crypto_ctx(inode,
+						inode->i_sb->s_blocksize);
+		if (IS_ERR_OR_NULL(ctx)) {
+			/* We just set the policy, so ctx should not be NULL */
+			err = (ctx == NULL) ? -EIO : PTR_ERR(ctx);
+			goto err_drop_inode;
+		}
 		istr.name = (const unsigned char *) symname;
 		istr.len = len;
 		ostr.name = sd->encrypted_path;
-		ostr.len = disk_link.len;
-		err = ext4_fname_usr_to_disk(inode, &istr, &ostr);
+		err = ext4_fname_usr_to_disk(ctx, &istr, &ostr);
+		ext4_put_fname_crypto_ctx(&ctx);
 		if (err < 0)
 			goto err_drop_inode;
 		sd->len = cpu_to_le16(ostr.len);
@@ -3349,6 +3350,7 @@ static int ext4_symlink(struct inode *dir,
 err_drop_inode:
 	if (handle)
 		ext4_journal_stop(handle);
+	kfree(sd);
 	clear_nlink(inode);
 	unlock_new_inode(inode);
 	iput(inode);
