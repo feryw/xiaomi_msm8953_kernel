@@ -45,58 +45,6 @@
 #include <linux/cleancache.h>
 
 #include "ext4.h"
-#include <trace/events/android_fs.h>
-
-/*
- * Call ext4_decrypt on every single page, reusing the encryption
- * context.
- */
-static void completion_pages(struct work_struct *work)
-{
-#ifdef CONFIG_EXT4_FS_ENCRYPTION
-	struct ext4_crypto_ctx *ctx =
-		container_of(work, struct ext4_crypto_ctx, r.work);
-	struct bio	*bio	= ctx->r.bio;
-	struct bio_vec	*bv;
-	int		i;
-
-	bio_for_each_segment_all(bv, bio, i) {
-		struct page *page = bv->bv_page;
-
-		int ret = ext4_decrypt(page);
-		if (ret) {
-			WARN_ON_ONCE(1);
-			SetPageError(page);
-		} else
-			SetPageUptodate(page);
-		unlock_page(page);
-	}
-	ext4_release_crypto_ctx(ctx);
-	bio_put(bio);
-#else
-	BUG();
-#endif
-}
-
-static inline bool ext4_bio_encrypted(struct bio *bio)
-{
-#ifdef CONFIG_EXT4_FS_ENCRYPTION
-	return unlikely(bio->bi_private != NULL);
-#else
-	return false;
-#endif
-}
-
-static void
-ext4_trace_read_completion(struct bio *bio, int err)
-{
-	struct page *first_page = bio->bi_io_vec[0].bv_page;
-
-	if (first_page != NULL)
-		trace_android_fs_dataread_end(first_page->mapping->host,
-					      page_offset(first_page),
-					      bio->bi_iter.bi_size);
-}
 
 /*
  * I/O completion handler for multipage BIOs.
@@ -115,21 +63,6 @@ static void mpage_end_io(struct bio *bio, int err)
 	struct bio_vec *bv;
 	int i;
 
-	if (trace_android_fs_dataread_start_enabled())
-		ext4_trace_read_completion(bio, err);
-
-	if (ext4_bio_encrypted(bio)) {
-		struct ext4_crypto_ctx *ctx = bio->bi_private;
-
-		if (err) {
-			ext4_release_crypto_ctx(ctx);
-		} else {
-			INIT_WORK(&ctx->r.work, completion_pages);
-			ctx->r.bio = bio;
-			queue_work(ext4_read_workqueue, &ctx->r.work);
-			return;
-		}
-	}
 	bio_for_each_segment_all(bv, bio, i) {
 		struct page *page = bv->bv_page;
 
@@ -143,24 +76,6 @@ static void mpage_end_io(struct bio *bio, int err)
 	}
 
 	bio_put(bio);
-}
-
-static void
-ext4_submit_bio_read(struct bio *bio)
-{
-	if (trace_android_fs_dataread_start_enabled()) {
-		struct page *first_page = bio->bi_io_vec[0].bv_page;
-
-		if (first_page != NULL) {
-			trace_android_fs_dataread_start(
-				first_page->mapping->host,
-				page_offset(first_page),
-				bio->bi_iter.bi_size,
-				current->pid,
-				current->comm);
-		}
-	}
-	submit_bio(READ, bio);
 }
 
 int ext4_mpage_readpages(struct address_space *mapping,
@@ -304,29 +219,17 @@ int ext4_mpage_readpages(struct address_space *mapping,
 		 */
 		if (bio && (last_block_in_bio != blocks[0] - 1)) {
 		submit_and_realloc:
-			ext4_submit_bio_read(bio);
+			submit_bio(READ, bio);
 			bio = NULL;
 		}
 		if (bio == NULL) {
-			struct ext4_crypto_ctx *ctx = NULL;
-
-			if (ext4_encrypted_inode(inode) &&
-			    S_ISREG(inode->i_mode)) {
-				ctx = ext4_get_crypto_ctx(inode);
-				if (IS_ERR(ctx))
-					goto set_error_page;
-			}
 			bio = bio_alloc(GFP_KERNEL,
 				min_t(int, nr_pages, bio_get_nr_vecs(bdev)));
-			if (!bio) {
-				if (ctx)
-					ext4_release_crypto_ctx(ctx);
+			if (!bio)
 				goto set_error_page;
-			}
 			bio->bi_bdev = bdev;
 			bio->bi_iter.bi_sector = blocks[0] << (blkbits - 9);
 			bio->bi_end_io = mpage_end_io;
-			bio->bi_private = ctx;
 		}
 
 		length = first_hole << blkbits;
@@ -336,14 +239,14 @@ int ext4_mpage_readpages(struct address_space *mapping,
 		if (((map.m_flags & EXT4_MAP_BOUNDARY) &&
 		     (relative_block == map.m_len)) ||
 		    (first_hole != blocks_per_page)) {
-			ext4_submit_bio_read(bio);
+			submit_bio(READ, bio);
 			bio = NULL;
 		} else
 			last_block_in_bio = blocks[blocks_per_page - 1];
 		goto next_page;
 	confused:
 		if (bio) {
-			ext4_submit_bio_read(bio);
+			submit_bio(READ, bio);
 			bio = NULL;
 		}
 		if (!PageUptodate(page))
@@ -356,6 +259,6 @@ int ext4_mpage_readpages(struct address_space *mapping,
 	}
 	BUG_ON(pages && !list_empty(pages));
 	if (bio)
-		ext4_submit_bio_read(bio);
+		submit_bio(READ, bio);
 	return 0;
 }
