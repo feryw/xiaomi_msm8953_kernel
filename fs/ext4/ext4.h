@@ -601,6 +601,8 @@ enum {
 #define EXT4_ENCRYPTION_MODE_AES_256_CBC	3
 #define EXT4_ENCRYPTION_MODE_AES_256_CTS	4
 
+#include "ext4_crypto.h"
+
 /*
  * ioctl commands
  */
@@ -2076,119 +2078,6 @@ int ext4_process_policy(const struct ext4_encryption_policy *policy,
 			struct inode *inode);
 int ext4_get_policy(struct inode *inode,
 		    struct ext4_encryption_policy *policy);
-
-/* crypto.c */
-extern struct kmem_cache *ext4_crypt_info_cachep;
-bool ext4_valid_contents_enc_mode(uint32_t mode);
-uint32_t ext4_validate_encryption_key_size(uint32_t mode, uint32_t size);
-extern struct workqueue_struct *ext4_read_workqueue;
-struct ext4_crypto_ctx *ext4_get_crypto_ctx(struct inode *inode);
-void ext4_release_crypto_ctx(struct ext4_crypto_ctx *ctx);
-void ext4_restore_control_page(struct page *data_page);
-struct page *ext4_encrypt(struct inode *inode,
-			  struct page *plaintext_page);
-int ext4_decrypt(struct page *page);
-int ext4_encrypted_zeroout(struct inode *inode, struct ext4_extent *ex);
-
-#ifdef CONFIG_EXT4_FS_ENCRYPTION
-int ext4_init_crypto(void);
-void ext4_exit_crypto(void);
-static inline int ext4_sb_has_crypto(struct super_block *sb)
-{
-	return EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_ENCRYPT);
-}
-#else
-static inline int ext4_init_crypto(void) { return 0; }
-static inline void ext4_exit_crypto(void) { }
-static inline int ext4_sb_has_crypto(struct super_block *sb)
-{
-	return 0;
-}
-#endif
-
-/* crypto_fname.c */
-bool ext4_valid_filenames_enc_mode(uint32_t mode);
-u32 ext4_fname_crypto_round_up(u32 size, u32 blksize);
-unsigned ext4_fname_encrypted_size(struct inode *inode, u32 ilen);
-int ext4_fname_crypto_alloc_buffer(struct inode *inode,
-				   u32 ilen, struct ext4_str *crypto_str);
-int _ext4_fname_disk_to_usr(struct inode *inode,
-			    struct dx_hash_info *hinfo,
-			    const struct ext4_str *iname,
-			    struct ext4_str *oname);
-int ext4_fname_disk_to_usr(struct inode *inode,
-			   struct dx_hash_info *hinfo,
-			   const struct ext4_dir_entry_2 *de,
-			   struct ext4_str *oname);
-int ext4_fname_usr_to_disk(struct inode *inode,
-			   const struct qstr *iname,
-			   struct ext4_str *oname);
-#ifdef CONFIG_EXT4_FS_ENCRYPTION
-void ext4_fname_crypto_free_buffer(struct ext4_str *crypto_str);
-int ext4_fname_setup_filename(struct inode *dir, const struct qstr *iname,
-			      int lookup, struct ext4_filename *fname);
-void ext4_fname_free_filename(struct ext4_filename *fname);
-#else
-static inline
-int ext4_setup_fname_crypto(struct inode *inode)
-{
-	return 0;
-}
-static inline void ext4_fname_crypto_free_buffer(struct ext4_str *p) { }
-static inline int ext4_fname_setup_filename(struct inode *dir,
-				     const struct qstr *iname,
-				     int lookup, struct ext4_filename *fname)
-{
-	fname->usr_fname = iname;
-	fname->disk_name.name = (unsigned char *) iname->name;
-	fname->disk_name.len = iname->len;
-	return 0;
-}
-static inline void ext4_fname_free_filename(struct ext4_filename *fname) { }
-#endif
-
-
-/* crypto_key.c */
-void ext4_free_crypt_info(struct ext4_crypt_info *ci);
-void ext4_free_encryption_info(struct inode *inode, struct ext4_crypt_info *ci);
-int _ext4_get_encryption_info(struct inode *inode);
-
-#ifdef CONFIG_EXT4_FS_ENCRYPTION
-int ext4_has_encryption_key(struct inode *inode);
-
-static inline int ext4_get_encryption_info(struct inode *inode)
-{
-	struct ext4_crypt_info *ci = EXT4_I(inode)->i_crypt_info;
-
-	if (!ci ||
-	    (ci->ci_keyring_key &&
-	     (ci->ci_keyring_key->flags & ((1 << KEY_FLAG_INVALIDATED) |
-					   (1 << KEY_FLAG_REVOKED) |
-					   (1 << KEY_FLAG_DEAD)))))
-		return _ext4_get_encryption_info(inode);
-	return 0;
-}
-
-static inline struct ext4_crypt_info *ext4_encryption_info(struct inode *inode)
-{
-	return EXT4_I(inode)->i_crypt_info;
-}
-
-#else
-static inline int ext4_has_encryption_key(struct inode *inode)
-{
-	return 0;
-}
-static inline int ext4_get_encryption_info(struct inode *inode)
-{
-	return 0;
-}
-static inline struct ext4_crypt_info *ext4_encryption_info(struct inode *inode)
-{
-	return NULL;
-}
-#endif
-
 
 /* dir.c */
 extern int __ext4_check_dir_entry(const char *, unsigned int, struct inode *,
