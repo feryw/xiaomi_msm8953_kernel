@@ -608,15 +608,17 @@ static struct stats dx_show_leaf(struct inode *dir,
 				char *name;
 				struct ext4_str fname_crypto_str
 					= {.name = NULL, .len = 0};
-				int res = 0;
+				struct ext4_fname_crypto_ctx *ctx = NULL;
+				int res;
 
 				name  = de->name;
 				len = de->name_len;
-				if (ext4_encrypted_inode(inode))
-					res = ext4_get_encryption_info(dir);
-				if (res) {
-					printk(KERN_WARNING "Error setting up"
-					       " fname crypto: %d\n", res);
+				ctx = ext4_get_fname_crypto_ctx(dir,
+								EXT4_NAME_LEN);
+				if (IS_ERR(ctx)) {
+					printk(KERN_WARNING "Error acquiring"
+					" crypto ctxt--skipping crypto\n");
+					ctx = NULL;
 				}
 				if (ctx == NULL) {
 					/* Directory is not encrypted */
@@ -636,9 +638,10 @@ static struct stats dx_show_leaf(struct inode *dir,
 							"allocating crypto "
 							"buffer--skipping "
 							"crypto\n");
+						ext4_put_fname_crypto_ctx(&ctx);
 						ctx = NULL;
 					}
-					res = ext4_fname_disk_to_usr(ctx, NULL, de,
+					res = ext4_fname_disk_to_usr(ctx, de,
 							&fname_crypto_str);
 					if (res < 0) {
 						printk(KERN_WARNING "Error "
@@ -651,11 +654,19 @@ static struct stats dx_show_leaf(struct inode *dir,
 						name = fname_crypto_str.name;
 						len = fname_crypto_str.len;
 					}
-					ext4fs_dirhash(de->name, de->name_len,
-						       &h);
+					res = ext4_fname_disk_to_hash(ctx, de,
+								      &h);
+					if (res < 0) {
+						printk(KERN_WARNING "Error "
+							"converting filename "
+							"from disk to htree"
+							"\n");
+						h.hash = 0xDEADBEEF;
+					}
 					printk("%*.s:(E)%x.%u ", len, name,
 					       h.hash, (unsigned) ((char *) de
 								   - base));
+					ext4_put_fname_crypto_ctx(&ctx);
 					ext4_fname_crypto_free_buffer(
 						&fname_crypto_str);
 				}
@@ -749,8 +760,28 @@ dx_probe(struct ext4_filename *fname, struct inode *dir,
 	if (hinfo->hash_version <= DX_HASH_TEA)
 		hinfo->hash_version += EXT4_SB(dir->i_sb)->s_hash_unsigned;
 	hinfo->seed = EXT4_SB(dir->i_sb)->s_hash_seed;
-	if (fname && fname_name(fname))
-		ext4fs_dirhash(fname_name(fname), fname_len(fname), hinfo);
+#ifdef CONFIG_EXT4_FS_ENCRYPTION
+	if (d_name) {
+		struct ext4_fname_crypto_ctx *ctx = NULL;
+		int res;
+
+		/* Check if the directory is encrypted */
+		ctx = ext4_get_fname_crypto_ctx(dir, EXT4_NAME_LEN);
+		if (IS_ERR(ctx)) {
+			ret_err = ERR_PTR(PTR_ERR(ctx));
+			goto fail;
+		}
+		res = ext4_fname_usr_to_hash(ctx, d_name, hinfo);
+		if (res < 0) {
+			ret_err = ERR_PTR(res);
+			goto fail;
+		}
+		ext4_put_fname_crypto_ctx(&ctx);
+	}
+#else
+	if (d_name)
+		ext4fs_dirhash(d_name->name, d_name->len, hinfo);
+#endif
 	hash = hinfo->hash;
 
 	if (root->info.unused_flags & 1) {
