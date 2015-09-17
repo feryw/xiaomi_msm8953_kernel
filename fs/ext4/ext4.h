@@ -2131,21 +2131,16 @@ int ext4_fname_disk_to_usr(struct ext4_fname_crypto_ctx *ctx,
 int ext4_fname_usr_to_disk(struct ext4_fname_crypto_ctx *ctx,
 			   const struct qstr *iname,
 			   struct ext4_str *oname);
-int ext4_fname_usr_to_hash(struct ext4_fname_crypto_ctx *ctx,
-			   const struct qstr *iname,
-			   struct dx_hash_info *hinfo);
 int ext4_fname_crypto_namelen_on_disk(struct ext4_fname_crypto_ctx *ctx,
 				      u32 namelen);
-int ext4_fname_match(struct ext4_fname_crypto_ctx *ctx, struct ext4_str *cstr,
-		     int len, const char * const name,
-		     struct ext4_dir_entry_2 *de);
-
-
 #ifdef CONFIG_EXT4_FS_ENCRYPTION
 void ext4_put_fname_crypto_ctx(struct ext4_fname_crypto_ctx **ctx);
 struct ext4_fname_crypto_ctx *ext4_get_fname_crypto_ctx(struct inode *inode,
 							u32 max_len);
 void ext4_fname_crypto_free_buffer(struct ext4_str *crypto_str);
+int ext4_fname_setup_filename(struct inode *dir, const struct qstr *iname,
+			      int lookup, struct ext4_filename *fname);
+void ext4_fname_free_filename(struct ext4_filename *fname);
 #else
 static inline
 void ext4_put_fname_crypto_ctx(struct ext4_fname_crypto_ctx **ctx) { }
@@ -2156,6 +2151,16 @@ struct ext4_fname_crypto_ctx *ext4_get_fname_crypto_ctx(struct inode *inode,
 	return NULL;
 }
 static inline void ext4_fname_crypto_free_buffer(struct ext4_str *p) { }
+static inline int ext4_fname_setup_filename(struct inode *dir,
+				     const struct qstr *iname,
+				     int lookup, struct ext4_filename *fname)
+{
+	fname->usr_fname = iname;
+	fname->disk_name.name = (unsigned char *) iname->name;
+	fname->disk_name.len = iname->len;
+	return 0;
+}
+static inline void ext4_fname_free_filename(struct ext4_filename *fname) { }
 #endif
 
 
@@ -2192,11 +2197,10 @@ extern int ext4_find_dest_de(struct inode *dir, struct inode *inode,
 			     struct ext4_filename *fname,
 			     struct ext4_dir_entry_2 **dest_de);
 int ext4_insert_dentry(struct inode *dir,
-			struct inode *inode,
-			struct ext4_dir_entry_2 *de,
-			int buf_size,
-		       const struct qstr *iname,
-			const char *name, int namelen);
+		       struct inode *inode,
+		       struct ext4_dir_entry_2 *de,
+		       int buf_size,
+		       struct ext4_filename *fname);
 static inline void ext4_update_dx_flag(struct inode *inode)
 {
 	if (!EXT4_HAS_COMPAT_FEATURE(inode->i_sb,
