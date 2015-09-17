@@ -964,7 +964,7 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
 	if (unlikely(err))
 		page_zero_new_buffers(page, from, to);
 	else if (decrypt)
-		err = ext4_decrypt(page);
+		err = ext4_decrypt_one(inode, page);
 	return err;
 }
 #endif

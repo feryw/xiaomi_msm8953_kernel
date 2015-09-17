@@ -87,7 +87,7 @@ static void ext4_finish_bio(struct bio *bio)
 			/* The bounce data pages are unmapped. */
 			data_page = page;
 			ctx = (struct ext4_crypto_ctx *)page_private(data_page);
-			page = ctx->w.control_page;
+			page = ctx->control_page;
 		}
 #endif
 
@@ -487,8 +487,7 @@ int ext4_bio_write_page(struct ext4_io_submit *io,
 
 	bh = head = page_buffers(page);
 
-	if (ext4_encrypted_inode(inode) && S_ISREG(inode->i_mode) &&
-	    nr_to_submit) {
+	if (ext4_encrypted_inode(inode) && S_ISREG(inode->i_mode)) {
 		data_page = ext4_encrypt(inode, page);
 		if (IS_ERR(data_page)) {
 			ret = PTR_ERR(data_page);
