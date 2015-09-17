@@ -941,7 +941,7 @@ static int htree_dirblock_to_tree(struct file *dir_file,
 	struct buffer_head *bh;
 	struct ext4_dir_entry_2 *de, *top;
 	int err = 0, count = 0;
-	struct ext4_str fname_crypto_str = {.name = NULL, .len = 0}, tmp_str;
+	struct ext4_str tmp_str;
 
 	dxtrace(printk(KERN_INFO "In htree dirblock_to_tree: block %lu\n",
 							(unsigned long)block));
@@ -984,30 +984,13 @@ static int htree_dirblock_to_tree(struct file *dir_file,
 			continue;
 		if (de->inode == 0)
 			continue;
-		if (!ext4_encrypted_inode(dir)) {
-			tmp_str.name = de->name;
-			tmp_str.len = de->name_len;
-			err = ext4_htree_store_dirent(dir_file,
-				   hinfo->hash, hinfo->minor_hash, de,
-				   &tmp_str);
-		} else {
-			int save_len = fname_crypto_str.len;
-
-			/* Directory is encrypted */
-			err = ext4_fname_disk_to_usr(dir, hinfo, de,
-						     &fname_crypto_str);
-			if (err < 0) {
-				count = err;
-				goto errout;
-			}
-			err = ext4_htree_store_dirent(dir_file,
-				   hinfo->hash, hinfo->minor_hash, de,
-					&fname_crypto_str);
-			fname_crypto_str.len = save_len;
-		}
+		tmp_str.name = de->name;
+		tmp_str.len = de->name_len;
+		err = ext4_htree_store_dirent(dir_file,
+			   hinfo->hash, hinfo->minor_hash, de, &tmp_str);
 		if (err != 0) {
-			count = err;
-			goto errout;
+			brelse(bh);
+			return err;
 		}
 		count++;
 	}
