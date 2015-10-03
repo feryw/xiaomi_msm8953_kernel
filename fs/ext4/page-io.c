@@ -487,7 +487,8 @@ int ext4_bio_write_page(struct ext4_io_submit *io,
 
 	bh = head = page_buffers(page);
 
-	if (ext4_encrypted_inode(inode) && S_ISREG(inode->i_mode)) {
+	if (ext4_encrypted_inode(inode) && S_ISREG(inode->i_mode) &&
+	    nr_to_submit) {
 		data_page = ext4_encrypt(inode, page);
 		if (IS_ERR(data_page)) {
 			ret = PTR_ERR(data_page);
