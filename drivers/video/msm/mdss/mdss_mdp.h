@@ -835,6 +835,7 @@ struct mdss_overlay_private {
 
 	struct kthread_worker worker;
 	struct kthread_work retire_work;
+	struct kthread_work vsync_work;
 	struct task_struct *thread;
 };
 
