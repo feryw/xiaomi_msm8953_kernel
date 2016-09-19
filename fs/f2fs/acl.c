@@ -206,7 +206,11 @@ static int __f2fs_set_acl(struct inode *inode, int type,
 	switch (type) {
 	case ACL_TYPE_ACCESS:
 		name_index = F2FS_XATTR_INDEX_POSIX_ACL_ACCESS;
+<<<<<<< HEAD
 		if (acl && !ipage) {
+=======
+		if (acl) {
+>>>>>>> e33f744a76a3... BACKPORT: posix_acl: Clear SGID bit when setting file permissions
 			error = posix_acl_update_mode(inode, &inode->i_mode, &acl);
 			if (error)
 				return error;
