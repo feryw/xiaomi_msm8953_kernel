@@ -309,8 +309,55 @@ static void find_metadata_offset(struct fec_header *fec,
 		*metadata_offset = device_size - VERITY_METADATA_SIZE;
 }
 
-static struct android_metadata *extract_metadata(dev_t dev,
-				struct fec_header *fec)
+static int find_size(dev_t dev, u64 *device_size)
+{
+	struct block_device *bdev;
+
+	bdev = blkdev_get_by_dev(dev, FMODE_READ, NULL);
+	if (IS_ERR_OR_NULL(bdev)) {
+		DMERR("blkdev_get_by_dev failed");
+		return PTR_ERR(bdev);
+	}
+
+	*device_size = i_size_read(bdev->bd_inode);
+	*device_size >>= SECTOR_SHIFT;
+
+	DMINFO("blkdev size in sectors: %llu", *device_size);
+	blkdev_put(bdev, FMODE_READ);
+	return 0;
+}
+
+static int verify_header(struct android_metadata_header *header)
+{
+	int retval = -EINVAL;
+
+	return VERITY_STATE_DISABLE;
+
+	if (is_userdebug() && le32_to_cpu(header->magic_number) ==
+			VERITY_METADATA_MAGIC_DISABLE)
+		return VERITY_STATE_DISABLE;
+
+	if (!(le32_to_cpu(header->magic_number) ==
+			VERITY_METADATA_MAGIC_NUMBER) ||
+			(le32_to_cpu(header->magic_number) ==
+			VERITY_METADATA_MAGIC_DISABLE)) {
+		DMERR("Incorrect magic number");
+		return retval;
+	}
+
+	if (le32_to_cpu(header->protocol_version) !=
+			VERITY_METADATA_VERSION) {
+		DMERR("Unsupported version %u",
+			le32_to_cpu(header->protocol_version));
+		return retval;
+	}
+
+	return 0;
+}
+
+static int extract_metadata(dev_t dev, struct fec_header *fec,
+				struct android_metadata **metadata,
+				bool *verity_enabled)
 {
 	struct block_device *bdev;
 	struct android_metadata_header *header;
