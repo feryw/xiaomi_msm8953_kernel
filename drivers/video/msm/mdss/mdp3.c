@@ -2666,9 +2666,11 @@ int mdp3_panel_get_intf_status(u32 disp_num, u32 intf_type)
 	/* DSI video mode or command mode */
 	rc = (status == 0x180000) || (status == 0x080000);
 
-	rc = mdp3_clk_enable(0, 0);
-	if (rc)
-		pr_err("fail to turn off MDP core clks\n");
+	/* For Video mode panel do not disable clock */
+	if (!(status == 0x180000)) {
+		if (mdp3_clk_enable(0, 0))
+			pr_err("fail to turn off MDP core clks\n");
+	}
 	return rc;
 }
 
