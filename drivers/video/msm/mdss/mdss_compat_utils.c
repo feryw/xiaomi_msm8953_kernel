@@ -123,6 +123,9 @@ static void  __copy_atomic_commit_struct(struct mdp_layer_commit  *commit,
 	unsigned int destSize = sizeof(commit->commit_v1.reserved);
 	unsigned int srcSize = sizeof(commit32->commit_v1.reserved);
 	unsigned int count = (destSize <= srcSize ? destSize : srcSize);
+	unsigned int destsize = sizeof(commit->commit_v1.reserved);
+	unsigned int srcsize = sizeof(commit32->commit_v1.reserved);
+	unsigned int count = (destsize <= srcsize ? destsize : srcsize);
 	commit->version = commit32->version;
 	commit->commit_v1.flags = commit32->commit_v1.flags;
 	commit->commit_v1.input_layer_cnt =
@@ -131,7 +134,7 @@ static void  __copy_atomic_commit_struct(struct mdp_layer_commit  *commit,
 	commit->commit_v1.right_roi = commit32->commit_v1.right_roi;
 
 	memcpy(&commit->commit_v1.reserved, &commit32->commit_v1.reserved,
-			count);
+		count);
 }
 
 static struct mdp_input_layer32 *__create_layer_list32(
