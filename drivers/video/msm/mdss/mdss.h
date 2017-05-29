@@ -512,6 +512,8 @@ struct mdss_data_type {
 	u32 bcolor1;
 	u32 bcolor2;
 	struct mdss_scaler_block *scaler_off;
+
+	u32 splash_intf_sel;
 };
 
 extern struct mdss_data_type *mdss_res;
