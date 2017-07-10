@@ -154,6 +154,25 @@
 
 	soc: soc { };
 
+	firmware: firmware {
+		android {
+			compatible = "android,firmware";
+			fstab {
+				compatible = "android,fstab";
+				 system {
+					compatible = "android,system";
+					dev = "/dev/block/platform/soc/7464900.sdhci/by-name/system";
+					type = "ext4";
+					mnt_flags = "ro,barrier=1,discard";
+					fsmgr_flags = "wait,verify";
+					status = "ok";
+				};
+
+			};
+		};
+	};
+
+>>>>>>> fa10cc3bc877... ARM: dts: msm: Mount the system partition during early init
 	reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
