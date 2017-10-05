@@ -553,9 +553,9 @@ static void binder_delete_free_buffer(struct binder_alloc *alloc,
 
 	if (to_free) {
 		binder_alloc_debug(BINDER_DEBUG_BUFFER_ALLOC,
-				"%d: merge free, buffer %pK do not share page with %pK or %pK\n",
-				alloc->pid, buffer->data,
-				prev->data, next->data);
+				   "%d: merge free, buffer %pK do not share page with %pK or %pK\n",
+				   alloc->pid, buffer->data,
+				   prev->data, next ? next->data : NULL);
 		binder_update_page_range(alloc, 0, buffer_start_page(buffer),
 				buffer_start_page(buffer) + PAGE_SIZE);
 	}
