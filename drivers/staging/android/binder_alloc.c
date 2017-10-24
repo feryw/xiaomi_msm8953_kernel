@@ -278,6 +278,9 @@ static int binder_update_page_range(struct binder_alloc *alloc, int allocate,
 			goto err_vm_insert_page_failed;
 		}
 
+		if (index + 1 > alloc->pages_high)
+			alloc->pages_high = index + 1;
+
 		trace_binder_alloc_page_end(alloc, index);
 	}
 	if (mm) {
@@ -827,6 +830,7 @@ void binder_alloc_print_pages(struct seq_file *m,
 	}
 	mutex_unlock(&alloc->mutex);
 	seq_printf(m, "  pages: %d:%d:%d\n", active, lru, free);
+	seq_printf(m, "  pages high watermark: %zu\n", alloc->pages_high);
 }
 
 /**
