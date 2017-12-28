@@ -103,7 +103,8 @@ static ssize_t power_supply_show_property(struct device *dev,
 		return sprintf(buf, "%s\n", technology_text[value.intval]);
 	else if (off == POWER_SUPPLY_PROP_CAPACITY_LEVEL)
 		return sprintf(buf, "%s\n", capacity_level_text[value.intval]);
-	else if (off == POWER_SUPPLY_PROP_TYPE)
+	else if (off == POWER_SUPPLY_PROP_TYPE ||
+			off == POWER_SUPPLY_PROP_REAL_TYPE)
 		return sprintf(buf, "%s\n", type_text[value.intval]);
 	else if (off == POWER_SUPPLY_PROP_SCOPE)
 		return sprintf(buf, "%s\n", scope_text[value.intval]);
@@ -253,6 +254,27 @@ static struct device_attribute power_supply_attrs[] = {
 	POWER_SUPPLY_ATTR(enable_jeita_detection),
 	POWER_SUPPLY_ATTR(battery_info),
 	POWER_SUPPLY_ATTR(battery_info_id),
+	POWER_SUPPLY_ATTR(typec_cc_orientation),
+	POWER_SUPPLY_ATTR(typec_power_role),
+	POWER_SUPPLY_ATTR(pd_allowed),
+	POWER_SUPPLY_ATTR(pd_active),
+	POWER_SUPPLY_ATTR(pd_in_hard_reset),
+	POWER_SUPPLY_ATTR(pd_current_max),
+	POWER_SUPPLY_ATTR(pd_usb_suspend_supported),
+	POWER_SUPPLY_ATTR(charger_temp),
+	POWER_SUPPLY_ATTR(charger_temp_max),
+	POWER_SUPPLY_ATTR(parallel_disable),
+	POWER_SUPPLY_ATTR(pe_start),
+	POWER_SUPPLY_ATTR(set_ship_mode),
+	POWER_SUPPLY_ATTR(debug_battery),
+	POWER_SUPPLY_ATTR(fcc_delta),
+	POWER_SUPPLY_ATTR(icl_reduction),
+	POWER_SUPPLY_ATTR(parallel_mode),
+	POWER_SUPPLY_ATTR(ctm_current_max),
+	POWER_SUPPLY_ATTR(die_health),
+	POWER_SUPPLY_ATTR(connector_health),
+	POWER_SUPPLY_ATTR(hw_current_max),
+	POWER_SUPPLY_ATTR(real_type),
 	/* Local extensions of type int64_t */
 	POWER_SUPPLY_ATTR(charge_counter_ext),
 	/* Properties of type `const char *' */
