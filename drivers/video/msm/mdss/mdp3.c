@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2013-2018, The Linux Foundation. All rights reserved.
  * Copyright (C) 2007 Google Incorporated
  *
  * This software is licensed under the terms of the GNU General Public
@@ -46,6 +46,7 @@
 #include <linux/msm-bus-board.h>
 #include <linux/qcom_iommu.h>
 #include <linux/msm_iommu_domains.h>
+#include <linux/vmalloc.h>
 
 #include <linux/msm_dma_iommu_mapping.h>
 
@@ -1830,6 +1831,10 @@ int mdp3_put_img(struct mdp3_img_data *data, int client)
 	} else {
 		return -EINVAL;
 	}
+	if (client == MDP3_CLIENT_PPP || client == MDP3_CLIENT_DMA_P) {
+		vfree(data->tab_clone->sgl);
+		kfree(data->tab_clone);
+	}
 	return 0;
 }
 
@@ -1929,6 +1934,11 @@ err_unmap:
 			mdss_smmu_dma_data_direction(DMA_BIDIRECTIONAL));
 	dma_buf_detach(data->srcp_dma_buf, data->srcp_attachment);
 	dma_buf_put(data->srcp_dma_buf);
+
+	if (client ==  MDP3_CLIENT_PPP || client == MDP3_CLIENT_DMA_P) {
+		vfree(data->tab_clone->sgl);
+		kfree(data->tab_clone);
+	}
 	return ret;
 
 }
