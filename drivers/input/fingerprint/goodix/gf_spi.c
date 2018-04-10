@@ -3,7 +3,7 @@
   * Copyright (C) 2006 SWAPP
   *     Andrea Paterniani <a.paterniani@swapp-eng.it>
   * Copyright (C) 2007 David Brownell (simplification, cleanup)
-  * Copyright (C) 2017 XiaoMi, Inc.
+  * Copyright (C) 2018 XiaoMi, Inc.
   *
   * This program is free software; you can redistribute it and/or modify
   * it under the terms of the GNU General Public License as published by
@@ -266,7 +266,7 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	struct gf_dev *gf_dev = &gf;
 	struct gf_key gf_key = { 0 };
 	int retval = 0;
-		int i;
+	int i;
 #ifdef AP_CONTROL_CLK
 	unsigned int speed = 0;
 #endif
@@ -568,14 +568,14 @@ static const struct file_operations gf_fops = {
 };
 
 static int goodix_fb_state_chg_callback(struct notifier_block *nb,
-					unsigned long val, void *data)
+		unsigned long val, void *data)
 {
 	struct gf_dev *gf_dev;
 	struct fb_event *evdata = data;
 	unsigned int blank;
 
 #if defined(GF_NETLINK_ENABLE)
-		char temp = 0;
+	char temp = 0;
 #endif
 
 	if (val != FB_EARLY_EVENT_BLANK)
@@ -644,7 +644,6 @@ static void gf_reg_key_kernel(struct gf_dev *gf_dev)
 		pr_warn("Failed to register GF as input device.\n");
 }
 
-
 #if defined(USE_SPI_BUS)
 static int gf_probe(struct spi_device *spi)
 #elif defined(USE_PLATFORM_BUS)
@@ -666,7 +665,6 @@ static int gf_probe(struct platform_device *pdev)
 #elif defined(USE_PLATFORM_BUS)
 	gf_dev->spi = pdev;
 #endif
-
 	gf_dev->irq_gpio 		= 	-EINVAL;
 	gf_dev->reset_gpio 	= 	-EINVAL;
 	gf_dev->pwr_gpio 	= 	-EINVAL;
@@ -682,10 +680,9 @@ static int gf_probe(struct platform_device *pdev)
 	minor = find_first_zero_bit(minors, N_SPI_MINORS);
 	if (minor < N_SPI_MINORS) {
 		struct device *dev;
-
 		gf_dev->devt = MKDEV(SPIDEV_MAJOR, minor);
 		dev = device_create(gf_class, &gf_dev->spi->dev, gf_dev->devt,
-				    gf_dev, GF_DEV_NAME);
+				gf_dev, GF_DEV_NAME);
 		status = IS_ERR(dev) ? PTR_ERR(dev) : 0;
 	} else {
 		dev_dbg(&gf_dev->spi->dev, "no minor number available!\n");
@@ -781,7 +778,7 @@ static int gf_remove(struct platform_device *pdev)
 	if (gf_dev->users == 0)
 		kfree(gf_dev);
 
-		mutex_unlock(&device_list_lock);
+	mutex_unlock(&device_list_lock);
 
 	wake_lock_destroy(&gf_dev->ttw_wl);
 

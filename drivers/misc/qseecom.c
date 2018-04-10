@@ -1,6 +1,7 @@
 /*Qualcomm Secure Execution Environment Communicator (QSEECOM) driver
  *
  * Copyright (c) 2012-2017, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -2697,7 +2698,7 @@ int __qseecom_process_fsm_key_svc_cmd(struct qseecom_dev_handle *data_ptr,
 }
 
 static int __validate_send_service_cmd_inputs(struct qseecom_dev_handle *data,
-				struct qseecom_send_svc_cmd_req *req)
+		struct qseecom_send_svc_cmd_req *req)
 {
 	if (!req || !req->resp_buf || !req->cmd_req_buf) {
 		pr_err("req or cmd buffer or response buffer is null\n");
@@ -2725,22 +2726,22 @@ static int __validate_send_service_cmd_inputs(struct qseecom_dev_handle *data,
 	}
 
 	if (((uintptr_t)req->cmd_req_buf <
-				data->client.user_virt_sb_base) ||
-		((uintptr_t)req->cmd_req_buf >=
-		(data->client.user_virt_sb_base + data->client.sb_length))) {
+			data->client.user_virt_sb_base) ||
+			((uintptr_t)req->cmd_req_buf >=
+			(data->client.user_virt_sb_base + data->client.sb_length))) {
 		pr_err("cmd buffer address not within shared bufffer\n");
 		return -EINVAL;
 	}
 	if (((uintptr_t)req->resp_buf <
-				data->client.user_virt_sb_base)  ||
-		((uintptr_t)req->resp_buf >=
-		(data->client.user_virt_sb_base + data->client.sb_length))) {
+			data->client.user_virt_sb_base)  ||
+			((uintptr_t)req->resp_buf >=
+			(data->client.user_virt_sb_base + data->client.sb_length))) {
 		pr_err("response buffer address not within shared bufffer\n");
 		return -EINVAL;
 	}
 	if ((req->cmd_req_len == 0) || (req->resp_len == 0) ||
-		(req->cmd_req_len > data->client.sb_length) ||
-		(req->resp_len > data->client.sb_length)) {
+			(req->cmd_req_len > data->client.sb_length) ||
+			(req->resp_len > data->client.sb_length)) {
 		pr_err("cmd buf length or response buf length not valid\n");
 		return -EINVAL;
 	}
@@ -2753,7 +2754,7 @@ static int __validate_send_service_cmd_inputs(struct qseecom_dev_handle *data,
 		pr_debug("Not enough memory to fit cmd_buf.\n");
 		pr_debug("resp_buf. Required: %u, Available: %zu\n",
 				(req->cmd_req_len + req->resp_len),
-					data->client.sb_length);
+				data->client.sb_length);
 		return -ENOMEM;
 	}
 	if ((uintptr_t)req->cmd_req_buf > (ULONG_MAX - req->cmd_req_len)) {
@@ -2765,16 +2766,16 @@ static int __validate_send_service_cmd_inputs(struct qseecom_dev_handle *data,
 		return -EINVAL;
 	}
 	if (data->client.user_virt_sb_base >
-					(ULONG_MAX - data->client.sb_length)) {
+			(ULONG_MAX - data->client.sb_length)) {
 		pr_err("Integer overflow in user_virt_sb_base & sb_length\n");
 		return -EINVAL;
 	}
 	if ((((uintptr_t)req->cmd_req_buf + req->cmd_req_len) >
-		((uintptr_t)data->client.user_virt_sb_base +
-					data->client.sb_length)) ||
-		(((uintptr_t)req->resp_buf + req->resp_len) >
-		((uintptr_t)data->client.user_virt_sb_base +
-					data->client.sb_length))) {
+			((uintptr_t)data->client.user_virt_sb_base +
+			data->client.sb_length)) ||
+			(((uintptr_t)req->resp_buf + req->resp_len) >
+			((uintptr_t)data->client.user_virt_sb_base +
+			data->client.sb_length))) {
 		pr_err("cmd buf or resp buf is out of shared buffer region\n");
 		return -EINVAL;
 	}
@@ -2782,7 +2783,7 @@ static int __validate_send_service_cmd_inputs(struct qseecom_dev_handle *data,
 }
 
 static int qseecom_send_service_cmd(struct qseecom_dev_handle *data,
-				void __user *argp)
+		void __user *argp)
 {
 	int ret = 0;
 	struct qseecom_client_send_service_ireq send_svc_ireq;
@@ -2890,7 +2891,7 @@ static int qseecom_send_service_cmd(struct qseecom_dev_handle *data,
 		if (req.cmd_id == QSEOS_RPMB_CHECK_PROV_STATUS_COMMAND) {
 			pr_warn("RPMB key status is 0x%x\n", resp.result);
 			if (put_user(resp.result,
-				(uint32_t __user *)req.resp_buf)) {
+					(uint32_t __user *)req.resp_buf)) {
 				ret = -EINVAL;
 				goto exit;
 			}
@@ -3914,8 +3915,8 @@ err:
 }
 
 static int __qseecom_get_fw_data(const char *appname, u8 *img_data,
-				uint32_t fw_size,
-				struct qseecom_load_app_ireq *load_req)
+		uint32_t fw_size,
+		struct qseecom_load_app_ireq *load_req)
 {
 	int ret = -1;
 	int i = 0, rc = 0;
@@ -3937,7 +3938,7 @@ static int __qseecom_get_fw_data(const char *appname, u8 *img_data,
 	load_req->img_len = fw_entry->size;
 	if (load_req->img_len > fw_size) {
 		pr_err("app %s size %zu is larger than buf size %u\n",
-			appname, fw_entry->size, fw_size);
+				appname, fw_entry->size, fw_size);
 		ret = -EINVAL;
 		goto err;
 	}
@@ -3968,8 +3969,8 @@ static int __qseecom_get_fw_data(const char *appname, u8 *img_data,
 			goto err;
 		}
 		if ((fw_entry->size > U32_MAX - load_req->img_len) ||
-			(fw_entry->size + load_req->img_len > fw_size)) {
-			pr_err("Invalid file size for %s\n", fw_name);
+				(fw_entry->size + load_req->img_len > fw_size)) {
+				pr_err("Invalid file size for %s\n", fw_name);
 			ret = -EINVAL;
 			goto err;
 		}
@@ -6466,9 +6467,9 @@ static int __qseecom_qteec_issue_cmd(struct qseecom_dev_handle *data,
 	}
 
 	req->req_ptr = (void *)__qseecom_uvirt_to_kvirt(data,
-						(uintptr_t)req->req_ptr);
+			(uintptr_t)req->req_ptr);
 	req->resp_ptr = (void *)__qseecom_uvirt_to_kvirt(data,
-						(uintptr_t)req->resp_ptr);
+			(uintptr_t)req->resp_ptr);
 
 	if ((cmd_id == QSEOS_TEE_OPEN_SESSION) ||
 			(cmd_id == QSEOS_TEE_REQUEST_CANCELLATION)) {

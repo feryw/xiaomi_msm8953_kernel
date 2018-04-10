@@ -837,7 +837,6 @@ static long qbt1000_ioctl(struct file *file, unsigned cmd, unsigned long arg)
 				"%s: Failed copy 2us LOAD rc:%d\n",
 				 __func__, rc);
 			rc = -ENOMEM;
-			goto end;
 		}
 
 		break;

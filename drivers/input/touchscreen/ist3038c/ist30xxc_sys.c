@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 2010,Imagis Technology Co. Ltd. All Rights Reserved.
- *  Copyright (C) 2017 XiaoMi, Inc.
+ *  Copyright (C) 2018 XiaoMi, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -127,7 +127,7 @@ int ist30xx_cmd_hold(struct ist30xx_data *data, int enable)
 }
 
 int ist30xx_i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
-			 int msg_num, u8 *cmd_buf)
+		int msg_num, u8 *cmd_buf)
 {
 	int ret = 0;
 	int idx = msg_num - 1;
@@ -166,7 +166,7 @@ int ist30xx_i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
 		ret = i2c_transfer(adap, msgs, msg_num);
 		if (unlikely(ret != msg_num)) {
 			tsp_err("%s() : i2c_transfer failed(%d), num=%d\n",
-				__func__, ret, msg_num);
+					__func__, ret, msg_num);
 			break;
 		}
 
@@ -239,7 +239,7 @@ int ist30xx_write_buf(struct i2c_client *client, u32 cmd, u32 *buf, u16 len)
 	msg.buf = msg_buf;
 
 	ret = ist30xx_i2c_transfer(client->adapter, &msg, WRITE_CMD_MSG_LEN,
-				   cmd_buf);
+			cmd_buf);
 	if (unlikely(ret != WRITE_CMD_MSG_LEN))
 		return -EIO;
 
@@ -363,7 +363,6 @@ int ist30xx_burst_write(struct i2c_client *client, u32 addr,
 	for (i = 0; i < len; i += max_len) {
 		if (remain_len < max_len)
 			max_len = remain_len;
-
 		ret = ist30xx_write_buf(client, addr, buf32, max_len);
 		if (unlikely(ret)) {
 			tsp_err("Burst fail, addr: %x\n", __func__, addr);
@@ -380,11 +379,8 @@ int ist30xx_burst_write(struct i2c_client *client, u32 addr,
 
 static void ts_power_enable(struct ist30xx_data *data, int en)
 {
-
 	if (en) {
-
 		gpio_direction_output(data->dt_data->reset_gpio, 1);
-
 	} else {
 
 		gpio_direction_output(data->dt_data->reset_gpio, 0);

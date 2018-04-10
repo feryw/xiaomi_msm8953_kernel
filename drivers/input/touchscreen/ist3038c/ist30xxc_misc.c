@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 2010,Imagis Technology Co. Ltd. All Rights Reserved.
- *  Copyright (C) 2017 XiaoMi, Inc.
+ *  Copyright (C) 2018 XiaoMi, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ int ist30xx_check_valid_ch(struct ist30xx_data *data, int ch_tx, int ch_rx)
 		if (tkey->enable) {
 			for (i = 0; i < tkey->key_num; i++) {
 				if ((ch_tx == tkey->ch_num[i].tx) &&
-					(ch_rx == tkey->ch_num[i].rx))
+						(ch_rx == tkey->ch_num[i].rx))
 					return TSP_CH_KEY;
 			}
 		}
@@ -154,7 +154,7 @@ int print_touch_node(struct ist30xx_data *data, u8 flag,
 						val = 0;
 				} else if (flag == NODE_FLAG_DIFF) {
 					val = (int)(node->raw[(j * tsp->ch_num.rx) + i]
-						- node->base[(j * tsp->ch_num.rx) + i]);
+							- node->base[(j * tsp->ch_num.rx) + i]);
 				} else {
 					return 0;
 				}
@@ -187,7 +187,7 @@ int print_touch_node(struct ist30xx_data *data, u8 flag,
 						val = 0;
 				} else if (flag == NODE_FLAG_DIFF) {
 					val = (int)(node->raw[(i * tsp->ch_num.rx) + j]
-						- node->base[(i * tsp->ch_num.rx) + j]);
+							- node->base[(i * tsp->ch_num.rx) + j]);
 				} else {
 					return 0;
 				}
@@ -246,7 +246,7 @@ int parse_tsp_node(struct ist30xx_data *data, u8 flag,
 				break;
 			case NODE_FLAG_DIFF:
 				val = (s16)(node->raw[(i * tsp->ch_num.rx) + j]
-					- node->base[(i * tsp->ch_num.rx) + j]);
+						- node->base[(i * tsp->ch_num.rx) + j]);
 				break;
 			default:
 				val = 0;
@@ -277,7 +277,7 @@ int ist30xx_read_touch_node(struct ist30xx_data *data, u8 flag,
 		ist30xx_reset(data, false);
 
 		ret = ist30xx_write_cmd(data, IST30XX_HIB_CMD,
-			((eHCOM_CP_CORRECT_EN << 16) | (IST30XX_DISABLE & 0xFFFF)));
+				((eHCOM_CP_CORRECT_EN << 16) | (IST30XX_DISABLE & 0xFFFF)));
 		if (unlikely(ret))
 			goto read_tsp_node_end;
 
@@ -649,7 +649,7 @@ ssize_t ist30xx_frame_rawbase(struct device *dev, struct device_attribute *attr,
 	}
 
 	for (i = 0; i < IST30XX_MAX_NODE_NUM; i++) {
-	    count += snprintf(msg, msg_len, "%08x ", 0);
+		count += snprintf(msg, msg_len, "%08x ", 0);
 		strncat(buf8, msg, msg_len);
 	}
 
@@ -702,7 +702,7 @@ ssize_t ist30xx_frame_nocp(struct device *dev, struct device_attribute *attr,
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 	TSP_INFO *tsp = &data->tsp_info;
 	u8 flag = NODE_FLAG_RAW | NODE_FLAG_BASE | NODE_FLAG_FILTER |
-		  NODE_FLAG_NO_CCP;
+			NODE_FLAG_NO_CCP;
 
 	mutex_lock(&data->lock);
 	ret = ist30xx_read_touch_node(data, flag, &tsp->node);
@@ -1347,7 +1347,7 @@ ssize_t tunes_node_info_show(struct device *dev,
 
 /* sysfs: /sys/class/touch/tunes/regcmd */
 ssize_t tunes_regcmd_store(struct device *dev, struct device_attribute *attr,
-			   const char *buf, size_t size)
+	   const char *buf, size_t size)
 {
 	int ret = -1;
 	u32 *buf32;
@@ -1399,7 +1399,7 @@ regcmd_fail:
 }
 
 ssize_t tunes_regcmd_show(struct device *dev, struct device_attribute *attr,
-			  char *buf)
+		char *buf)
 {
 	int size;
 
@@ -1412,7 +1412,7 @@ ssize_t tunes_regcmd_show(struct device *dev, struct device_attribute *attr,
 #define MAX_WRITE_LEN   (1)
 /* sysfs: /sys/class/touch/tunes/reg */
 ssize_t tunes_reg_store(struct device *dev, struct device_attribute *attr,
-			const char *buf, size_t size)
+		const char *buf, size_t size)
 {
 	int ret;
 	u32 *buf32 = (u32 *)buf;
@@ -1678,12 +1678,12 @@ ssize_t ist30xx_rec_mode_store(struct device *dev,
 
 	if (data->status.power) {
 		if (data->debug_mode || data->jig_mode || data->rec_mode ||
-			data->debugging_mode) {
+				data->debugging_mode) {
 			ist30xx_write_cmd(data, IST30XX_HIB_CMD,
-				(eHCOM_SLEEP_MODE_EN << 16) | (IST30XX_DISABLE & 0xFFFF));
+					(eHCOM_SLEEP_MODE_EN << 16) | (IST30XX_DISABLE & 0xFFFF));
 		} else {
 			ist30xx_write_cmd(data, IST30XX_HIB_CMD,
-				(eHCOM_SLEEP_MODE_EN << 16) | (IST30XX_ENABLE & 0xFFFF));
+					(eHCOM_SLEEP_MODE_EN << 16) | (IST30XX_ENABLE & 0xFFFF));
 		}
 
 		ist30xx_write_cmd(data, IST30XX_HIB_CMD,
@@ -1702,7 +1702,7 @@ err_file_open:
 }
 
 ssize_t ist30xx_rec_mode_show(struct device *dev, struct device_attribute *attr,
-			  char *buf)
+		char *buf)
 {
 	int count;
 	int start_ch_rx;
@@ -1771,12 +1771,12 @@ ssize_t ist30xx_rec_mode_show(struct device *dev, struct device_attribute *attr,
 
 	if (data->status.power) {
 		if (data->debug_mode || data->jig_mode || data->rec_mode ||
-			data->debugging_mode) {
+				data->debugging_mode) {
 			ist30xx_write_cmd(data, IST30XX_HIB_CMD,
-				(eHCOM_SLEEP_MODE_EN << 16) | (IST30XX_DISABLE & 0xFFFF));
+					(eHCOM_SLEEP_MODE_EN << 16) | (IST30XX_DISABLE & 0xFFFF));
 		} else {
 			ist30xx_write_cmd(data, IST30XX_HIB_CMD,
-				(eHCOM_SLEEP_MODE_EN << 16) | (IST30XX_ENABLE & 0xFFFF));
+					(eHCOM_SLEEP_MODE_EN << 16) | (IST30XX_ENABLE & 0xFFFF));
 		}
 
 		ist30xx_write_cmd(data, IST30XX_HIB_CMD,
@@ -1797,7 +1797,7 @@ err_file_open:
 #ifdef IST30XX_ALGORITHM_MODE
 /* sysfs: /sys/class/touch/tunes/algorithm */
 ssize_t ist30xx_algr_store(struct device *dev, struct device_attribute *attr,
-			   const char *buf, size_t size)
+	   const char *buf, size_t size)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -1809,7 +1809,7 @@ ssize_t ist30xx_algr_store(struct device *dev, struct device_attribute *attr,
 }
 
 ssize_t ist30xx_algr_show(struct device *dev, struct device_attribute *attr,
-			  char *buf)
+		char *buf)
 {
 	int ret;
 	u32 algr_addr;
@@ -1835,7 +1835,7 @@ ssize_t ist30xx_algr_show(struct device *dev, struct device_attribute *attr,
 
 /* sysfs: /sys/class/touch/tunes/intr_debug */
 ssize_t intr_debug_store(struct device *dev, struct device_attribute *attr,
-			 const char *buf, size_t size)
+		 const char *buf, size_t size)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -1847,7 +1847,7 @@ ssize_t intr_debug_store(struct device *dev, struct device_attribute *attr,
 }
 
 ssize_t intr_debug_show(struct device *dev, struct device_attribute *attr,
-			char *buf)
+		char *buf)
 {
 	int count = 0;
 	struct ist30xx_data *data = dev_get_drvdata(dev);
@@ -1863,7 +1863,7 @@ ssize_t intr_debug_show(struct device *dev, struct device_attribute *attr,
 
 /* sysfs: /sys/class/touch/tunes/intr_debug2 */
 ssize_t intr_debug2_store(struct device *dev, struct device_attribute *attr,
-			 const char *buf, size_t size)
+		 const char *buf, size_t size)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -1875,7 +1875,7 @@ ssize_t intr_debug2_store(struct device *dev, struct device_attribute *attr,
 }
 
 ssize_t intr_debug2_show(struct device *dev, struct device_attribute *attr,
-			char *buf)
+		char *buf)
 {
 	int count = 0;
 	struct ist30xx_data *data = dev_get_drvdata(dev);
@@ -1891,7 +1891,7 @@ ssize_t intr_debug2_show(struct device *dev, struct device_attribute *attr,
 
 /* sysfs: /sys/class/touch/tunes/intr_debug3 */
 ssize_t intr_debug3_store(struct device *dev, struct device_attribute *attr,
-			 const char *buf, size_t size)
+		 const char *buf, size_t size)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -1908,7 +1908,7 @@ ssize_t intr_debug3_show(struct device *dev, struct device_attribute *attr,
 	int count = 0;
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
-	 tsp_info("intr debug3 addr: 0x%x, count: %d\n", data->intr_debug3_addr,
+	tsp_info("intr debug3 addr: 0x%x, count: %d\n", data->intr_debug3_addr,
 			data->intr_debug2_size);
 
 	count = sprintf(buf, "intr debug3 addr: 0x%x, count: %d\n",
@@ -1991,7 +1991,7 @@ int ist30xx_put_frame(struct ist30xx_data *data, u32 ms, u32 *touch, u32 *frame,
 	pDebugBuf->RingBufCtr += size;
 	if (pDebugBuf->RingBufCtr > IST30XX_MAX_RINGBUF_SIZE) {
 		pDebugBuf->RingBufOutIdx +=
-			(pDebugBuf->RingBufCtr - IST30XX_MAX_RINGBUF_SIZE);
+				(pDebugBuf->RingBufCtr - IST30XX_MAX_RINGBUF_SIZE);
 		if (pDebugBuf->RingBufOutIdx >= IST30XX_MAX_RINGBUF_SIZE)
 			pDebugBuf->RingBufOutIdx -= IST30XX_MAX_RINGBUF_SIZE;
 
@@ -2011,7 +2011,7 @@ int ist30xx_put_frame(struct ist30xx_data *data, u32 ms, u32 *touch, u32 *frame,
 
 /* sysfs: /sys/class/touch/tunes/debugging_mode */
 ssize_t debugging_mode_store(struct device *dev, struct device_attribute *attr,
-			 const char *buf, size_t size)
+		 const char *buf, size_t size)
 {
 	int enable;
 	int noise = 1;
@@ -2039,12 +2039,12 @@ ssize_t debugging_mode_store(struct device *dev, struct device_attribute *attr,
 
 	if (data->status.power) {
 		if (data->debug_mode || data->jig_mode || data->rec_mode ||
-			data->debugging_mode) {
+				data->debugging_mode) {
 			ist30xx_write_cmd(data, IST30XX_HIB_CMD,
-				(eHCOM_SLEEP_MODE_EN << 16) | (IST30XX_DISABLE & 0xFFFF));
+					(eHCOM_SLEEP_MODE_EN << 16) | (IST30XX_DISABLE & 0xFFFF));
 		} else {
 			ist30xx_write_cmd(data, IST30XX_HIB_CMD,
-				(eHCOM_SLEEP_MODE_EN << 16) | (IST30XX_ENABLE & 0xFFFF));
+					(eHCOM_SLEEP_MODE_EN << 16) | (IST30XX_ENABLE & 0xFFFF));
 		}
 
 		ist30xx_write_cmd(data, IST30XX_HIB_CMD,
@@ -2055,7 +2055,7 @@ ssize_t debugging_mode_store(struct device *dev, struct device_attribute *attr,
 }
 
 ssize_t debugging_mode_show(struct device *dev, struct device_attribute *attr,
-			char *buf)
+		char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -2072,12 +2072,12 @@ ssize_t debugging_mode_show(struct device *dev, struct device_attribute *attr,
 
 	if (data->status.power) {
 		if (data->debug_mode || data->jig_mode || data->rec_mode ||
-			data->debugging_mode) {
+				data->debugging_mode) {
 			ist30xx_write_cmd(data, IST30XX_HIB_CMD,
-				(eHCOM_SLEEP_MODE_EN << 16) | (IST30XX_DISABLE & 0xFFFF));
+					(eHCOM_SLEEP_MODE_EN << 16) | (IST30XX_DISABLE & 0xFFFF));
 		} else {
 			ist30xx_write_cmd(data, IST30XX_HIB_CMD,
-				(eHCOM_SLEEP_MODE_EN << 16) | (IST30XX_ENABLE & 0xFFFF));
+					(eHCOM_SLEEP_MODE_EN << 16) | (IST30XX_ENABLE & 0xFFFF));
 		}
 
 		ist30xx_write_cmd(data, IST30XX_HIB_CMD,
@@ -2089,7 +2089,7 @@ ssize_t debugging_mode_show(struct device *dev, struct device_attribute *attr,
 
 /* sysfs: /sys/class/touch/tunes/debugging_status */
 ssize_t debugging_status_show(struct device *dev, struct device_attribute *attr,
-			char *buf)
+		char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -2098,7 +2098,7 @@ ssize_t debugging_status_show(struct device *dev, struct device_attribute *attr,
 
 /* sysfs: /sys/class/touch/tunes/debugging_cnt */
 ssize_t debugging_cnt_show(struct device *dev, struct device_attribute *attr,
-			char *buf)
+		char *buf)
 {
 	u32 cnt = (u32)ist30xx_get_debugging_cnt();
 
@@ -2109,7 +2109,7 @@ ssize_t debugging_cnt_show(struct device *dev, struct device_attribute *attr,
 
 /* sysfs: /sys/class/touch/tunes/debugging_frame */
 ssize_t debugging_frame_show(struct device *dev, struct device_attribute *attr,
-			char *buf)
+		char *buf)
 {
 	int i;
 	int count = 0;
@@ -2144,7 +2144,7 @@ ssize_t debugging_frame_show(struct device *dev, struct device_attribute *attr,
 
 /* sysfs: /sys/class/touch/tunes/tbase */
 ssize_t target_baseline_show(struct device *dev, struct device_attribute *attr,
-			char *buf)
+		char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -2300,7 +2300,7 @@ int ist30xx_init_misc_sysfs(struct ist30xx_data *data)
 
 	/* /sys/class/touch/sys/... */
 	if (unlikely(sysfs_create_group(&ist30xx_sys_dev->kobj,
-					&sys_attr_group)))
+			&sys_attr_group)))
 		tsp_err("Failed to create sysfs group(%s)!\n", "sys");
 
 	/* /sys/class/touch/tunes */
@@ -2308,7 +2308,7 @@ int ist30xx_init_misc_sysfs(struct ist30xx_data *data)
 
 	/* /sys/class/touch/tunes/... */
 	if (unlikely(sysfs_create_group(&ist30xx_tunes_dev->kobj,
-					&tunes_attr_group)))
+			&tunes_attr_group)))
 		tsp_err("Failed to create sysfs group(%s)!\n", "tunes");
 
 	/* /sys/class/touch/node */
@@ -2316,7 +2316,7 @@ int ist30xx_init_misc_sysfs(struct ist30xx_data *data)
 
 	/* /sys/class/touch/node/... */
 	if (unlikely(sysfs_create_group(&ist30xx_node_dev->kobj,
-					&node_attr_group)))
+			&node_attr_group)))
 		tsp_err("Failed to create sysfs group(%s)!\n", "node");
 
 	ist30xx_debugging_init(data);

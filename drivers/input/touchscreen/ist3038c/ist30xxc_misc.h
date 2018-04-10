@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 2010, Imagis Technology Co. Ltd. All Rights Reserved.
- * Copyright (C) 2017 XiaoMi, Inc.
+ *  Copyright (C) 2018 XiaoMi, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -36,17 +36,17 @@
 int ist30xx_check_valid_ch(struct ist30xx_data *data, int ch_tx, int ch_rx);
 int ist30xx_parse_cp_node(struct ist30xx_data *data, struct TSP_NODE_BUF *node);
 int parse_cp_node(struct ist30xx_data *data, u8 flag,
-	struct TSP_NODE_BUF *node, s16 *buf16, int mode);
+		 struct TSP_NODE_BUF *node, s16 *buf16, int mode);
 int ist30xx_read_cp_node(struct ist30xx_data *data, struct TSP_NODE_BUF *node);
 int ist30xx_parse_touch_node(struct ist30xx_data *data, u8 flag,
-	struct TSP_NODE_BUF *node);
+		 struct TSP_NODE_BUF *node);
 int parse_tsp_node(struct ist30xx_data *data, u8 flag,
-	struct TSP_NODE_BUF *node, s16 *buf16, int mode);
+		 struct TSP_NODE_BUF *node, s16 *buf16, int mode);
 int ist30xx_read_touch_node(struct ist30xx_data *data, u8 flag,
-	struct TSP_NODE_BUF *node);
+		 struct TSP_NODE_BUF *node);
 
 int ist30xx_put_frame(struct ist30xx_data *data, u32 ms, u32 *touch, u32 *frame,
-	int frame_cnt);
+		 int frame_cnt);
 
 int ist30xx_init_misc_sysfs(struct ist30xx_data *data);
 

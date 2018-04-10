@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 2010,Imagis Technology Co. Ltd. All Rights Reserved.
- *  Copyright (C) 2017 XiaoMi, Inc.
+ *  Copyright (C) 2018 XiaoMi, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -81,13 +81,11 @@ int ist30xx_parse_cmcs_bin(const u8 *buf, const u32 size)
 	int ret = -EPERM;
 	int i;
 	int node_spec_cnt;
-
 	memcpy(ts_cmcs->magic1, buf, sizeof(ts_cmcs->magic1));
 	memcpy(ts_cmcs->magic2, &buf[size - sizeof(ts_cmcs->magic2)],
-		   sizeof(ts_cmcs->magic2));
-
+			sizeof(ts_cmcs->magic2));
 	if (!strncmp(ts_cmcs->magic1, IST30XX_CMCS_MAGIC, sizeof(ts_cmcs->magic1))
-		&& !strncmp(ts_cmcs->magic2, IST30XX_CMCS_MAGIC,
+			&& !strncmp(ts_cmcs->magic2, IST30XX_CMCS_MAGIC,
 			sizeof(ts_cmcs->magic2))) {
 		int idx;
 
@@ -96,20 +94,19 @@ int ist30xx_parse_cmcs_bin(const u8 *buf, const u32 size)
 		memcpy(&ts_cmcs->items.cnt, &buf[idx], sizeof(ts_cmcs->items.cnt));
 		idx += sizeof(ts_cmcs->items.cnt);
 		ts_cmcs->items.item = kmalloc(
-			sizeof(struct CMCS_ITEM_INFO) * ts_cmcs->items.cnt, GFP_KERNEL);
+				sizeof(struct CMCS_ITEM_INFO) * ts_cmcs->items.cnt, GFP_KERNEL);
 		for (i = 0; i < ts_cmcs->items.cnt; i++) {
 			memcpy(&ts_cmcs->items.item[i], &buf[idx],
-				   sizeof(struct CMCS_ITEM_INFO));
+					sizeof(struct CMCS_ITEM_INFO));
 			idx += sizeof(struct CMCS_ITEM_INFO);
 		}
-
 		memcpy(&ts_cmcs->cmds.cnt, &buf[idx], sizeof(ts_cmcs->cmds.cnt));
 		idx += sizeof(ts_cmcs->cmds.cnt);
 		ts_cmcs->cmds.cmd = kmalloc(
 			sizeof(struct CMCS_CMD_INFO) * ts_cmcs->cmds.cnt, GFP_KERNEL);
 		for (i = 0; i < ts_cmcs->cmds.cnt; i++) {
 			memcpy(&ts_cmcs->cmds.cmd[i], &buf[idx],
-				   sizeof(struct CMCS_CMD_INFO));
+				sizeof(struct CMCS_CMD_INFO));
 			idx += sizeof(struct CMCS_CMD_INFO);
 		}
 
@@ -293,7 +290,7 @@ int ist30xx_set_cmcs_fw(struct ist30xx_data *data, CMCS_PARAM param, u32 *buf32)
 }
 
 int ist30xx_set_cmcs_sensor(struct ist30xx_data *data, CMCS_PARAM param,
-				u32 *buf32, int mode)
+		u32 *buf32, int mode)
 {
 	int ret;
 	int len = 0;
@@ -304,7 +301,7 @@ int ist30xx_set_cmcs_sensor(struct ist30xx_data *data, CMCS_PARAM param,
 		len = (param.cm_sensor1_size / IST30XX_DATA_LEN) - 2;
 		buf32 += 2;
 		tsp_verb("%08x %08x %08x %08x\n",
-			 buf32[0], buf32[1], buf32[2], buf32[3]);
+				buf32[0], buf32[1], buf32[2], buf32[3]);
 		tsp_verb("%08x(%d)\n", waddr, len);
 
 		if (len > 0) {
@@ -319,7 +316,7 @@ int ist30xx_set_cmcs_sensor(struct ist30xx_data *data, CMCS_PARAM param,
 		waddr = IST30XX_DA_ADDR(param.sensor2_addr);
 		len = param.cm_sensor2_size / IST30XX_DATA_LEN;
 		tsp_verb("%08x %08x %08x %08x\n",
-			 buf32[0], buf32[1], buf32[2], buf32[3]);
+				buf32[0], buf32[1], buf32[2], buf32[3]);
 		tsp_verb("%08x(%d)\n", waddr, len);
 
 		if (len > 0) {
@@ -334,7 +331,7 @@ int ist30xx_set_cmcs_sensor(struct ist30xx_data *data, CMCS_PARAM param,
 		waddr = IST30XX_DA_ADDR(param.sensor3_addr);
 		len = param.cm_sensor3_size / IST30XX_DATA_LEN;
 		tsp_verb("%08x %08x %08x %08x\n",
-			 buf32[0], buf32[1], buf32[2], buf32[3]);
+				buf32[0], buf32[1], buf32[2], buf32[3]);
 		tsp_verb("%08x(%d)\n", waddr, len);
 
 		if (len > 0) {
@@ -349,7 +346,7 @@ int ist30xx_set_cmcs_sensor(struct ist30xx_data *data, CMCS_PARAM param,
 		len = (param.cs_sensor1_size / IST30XX_DATA_LEN) - 2;
 		buf32 += 2;
 		tsp_verb("%08x %08x %08x %08x\n",
-			 buf32[0], buf32[1], buf32[2], buf32[3]);
+				buf32[0], buf32[1], buf32[2], buf32[3]);
 		tsp_verb("%08x(%d)\n", waddr, len);
 
 		if (len > 0) {
@@ -379,7 +376,7 @@ int ist30xx_set_cmcs_sensor(struct ist30xx_data *data, CMCS_PARAM param,
 		waddr = IST30XX_DA_ADDR(param.sensor3_addr);
 		len = param.cs_sensor3_size / IST30XX_DATA_LEN;
 		tsp_verb("%08x %08x %08x %08x\n",
-			 buf32[0], buf32[1], buf32[2], buf32[3]);
+				buf32[0], buf32[1], buf32[2], buf32[3]);
 		tsp_verb("%08x(%d)\n", waddr, len);
 
 		if (len > 0) {
@@ -394,7 +391,7 @@ int ist30xx_set_cmcs_sensor(struct ist30xx_data *data, CMCS_PARAM param,
 		len = (param.jit_sensor1_size / IST30XX_DATA_LEN) - 2;
 		buf32 += 2;
 		tsp_verb("%08x %08x %08x %08x\n",
-			 buf32[0], buf32[1], buf32[2], buf32[3]);
+			buf32[0], buf32[1], buf32[2], buf32[3]);
 		tsp_verb("%08x(%d)\n", waddr, len);
 
 		if (len > 0) {
@@ -409,7 +406,7 @@ int ist30xx_set_cmcs_sensor(struct ist30xx_data *data, CMCS_PARAM param,
 		waddr = IST30XX_DA_ADDR(param.sensor2_addr);
 		len = param.jit_sensor2_size / IST30XX_DATA_LEN;
 		tsp_verb("%08x %08x %08x %08x\n",
-			 buf32[0], buf32[1], buf32[2], buf32[3]);
+				buf32[0], buf32[1], buf32[2], buf32[3]);
 		tsp_verb("%08x(%d)\n", waddr, len);
 
 		if (len > 0) {
@@ -424,7 +421,7 @@ int ist30xx_set_cmcs_sensor(struct ist30xx_data *data, CMCS_PARAM param,
 		waddr = IST30XX_DA_ADDR(param.sensor3_addr);
 		len = param.jit_sensor3_size / IST30XX_DATA_LEN;
 		tsp_verb("%08x %08x %08x %08x\n",
-			 buf32[0], buf32[1], buf32[2], buf32[3]);
+			buf32[0], buf32[1], buf32[2], buf32[3]);
 		tsp_verb("%08x(%d)\n", waddr, len);
 
 		if (len > 0) {
@@ -520,21 +517,21 @@ int ist30xx_apply_cmcs_slope(struct ist30xx_data *data, CMCS_BUF *cmcs_buf)
 						cmcs_buf->spec_max[idx1] = 0;
 					} else if (type == TSP_CH_GTX) {
 						cmcs_buf->spec_min[idx1] =
-						    ts_cmcs->spec_item[i].spec_node.buf_min[gtx_idx];
+								ts_cmcs->spec_item[i].spec_node.buf_min[gtx_idx];
 						cmcs_buf->spec_max[idx1] =
-						    ts_cmcs->spec_item[i].spec_node.buf_max[gtx_idx];
+								ts_cmcs->spec_item[i].spec_node.buf_max[gtx_idx];
 						gtx_idx++;
 					} else if (type == TSP_CH_KEY) {
 						cmcs_buf->spec_min[idx1] =
-						    ts_cmcs->spec_item[i].spec_node.buf_min[key_idx];
+								ts_cmcs->spec_item[i].spec_node.buf_min[key_idx];
 						cmcs_buf->spec_max[idx1] =
-						    ts_cmcs->spec_item[i].spec_node.buf_max[key_idx];
+								ts_cmcs->spec_item[i].spec_node.buf_max[key_idx];
 						key_idx++;
 					} else {
 						cmcs_buf->spec_min[idx1] =
-						    ts_cmcs->spec_item[i].spec_node.buf_min[idx2];
+								ts_cmcs->spec_item[i].spec_node.buf_min[idx2];
 						cmcs_buf->spec_max[idx1] =
-						    ts_cmcs->spec_item[i].spec_node.buf_max[idx2];
+								ts_cmcs->spec_item[i].spec_node.buf_max[idx2];
 						idx2++;
 					}
 				}
@@ -643,8 +640,8 @@ int ist30xx_apply_cmcs_slope(struct ist30xx_data *data, CMCS_BUF *cmcs_buf)
 
 			pslope0[idx1] = (presult[idx2] - presult[idx1]);
 			pslope0[idx1] +=
-				(((pspec_min[idx1] + pspec_max[idx1]) / 2) -
-				 ((pspec_min[idx2] + pspec_max[idx2]) / 2));
+					(((pspec_min[idx1] + pspec_max[idx1]) / 2) -
+					((pspec_min[idx2] + pspec_max[idx2]) / 2));
 		}
 	}
 
@@ -656,8 +653,8 @@ int ist30xx_apply_cmcs_slope(struct ist30xx_data *data, CMCS_BUF *cmcs_buf)
 
 			pslope1[idx1] = (presult[idx2] - presult[idx1]);
 			pslope1[idx1] +=
-				(((pspec_min[idx1] + pspec_max[idx1]) / 2) -
-				 ((pspec_min[idx2] + pspec_max[idx2]) / 2));
+					(((pspec_min[idx1] + pspec_max[idx1]) / 2) -
+					((pspec_min[idx2] + pspec_max[idx2]) / 2));
 		}
 	}
 
@@ -670,8 +667,8 @@ int ist30xx_apply_cmcs_slope(struct ist30xx_data *data, CMCS_BUF *cmcs_buf)
 
 				pslope0[idx1] = (presult[idx2] - presult[idx1]);
 				pslope0[idx1] +=
-					(((pspec_min[idx1] + pspec_max[idx1]) / 2) -
-					 ((pspec_min[idx2] + pspec_max[idx2]) / 2));
+						(((pspec_min[idx1] + pspec_max[idx1]) / 2) -
+						((pspec_min[idx2] + pspec_max[idx2]) / 2));
 			}
 		}
 	}
@@ -685,8 +682,8 @@ int ist30xx_apply_cmcs_slope(struct ist30xx_data *data, CMCS_BUF *cmcs_buf)
 
 				pslope1[idx1] = (presult[idx2] - presult[idx1]);
 				pslope1[idx1] +=
-					(((pspec_min[idx1] + pspec_max[idx1]) / 2) -
-					 ((pspec_min[idx2] + pspec_max[idx2]) / 2));
+						(((pspec_min[idx1] + pspec_max[idx1]) / 2) -
+						((pspec_min[idx2] + pspec_max[idx2]) / 2));
 			}
 		}
 	}
@@ -738,7 +735,7 @@ int ist30xx_apply_cmcs_slope(struct ist30xx_data *data, CMCS_BUF *cmcs_buf)
 }
 
 int ist30xx_get_cmcs_buf(struct ist30xx_data *data, const char *mode,
-			 CMCS_ITEM items, s16 *buf)
+		CMCS_ITEM items, s16 *buf)
 {
 	int ret = 0;
 	int i;
@@ -751,7 +748,7 @@ int ist30xx_get_cmcs_buf(struct ist30xx_data *data, const char *mode,
 			waddr = IST30XX_DA_ADDR(items.item[i].addr);
 			len = items.item[i].size / IST30XX_DATA_LEN;
 			ret = ist30xx_burst_read(data->client,
-						 waddr, (u32 *)buf, len, true);
+					waddr, (u32 *)buf, len, true);
 			if (unlikely(ret))
 				return ret;
 			tsp_verb("%s, 0x%08x, %d\n", __func__, waddr, len);
@@ -794,7 +791,7 @@ int ist30xx_cmcs_wait(struct ist30xx_data *data, int mode)
 	else
 		return -EPERM;
 
-	   ret = ist30xx_write_cmd(data, waddr, val);
+	ret = ist30xx_write_cmd(data, waddr, val);
 	if (ret)
 		return -EPERM;
 
@@ -981,7 +978,7 @@ end:
 		tsp_warn("CmCs test Fail!, ret=%d\n", ret);
 	} else if (unlikely(chksum != ts_cmcs->param.cmcs_chksum)) {
 		tsp_warn("Error CheckSum: %x(%x)\n",
-			 chksum, ts_cmcs->param.cmcs_chksum);
+				chksum, ts_cmcs->param.cmcs_chksum);
 		ret = -ENOEXEC;
 	}
 
@@ -992,7 +989,6 @@ end:
 	return ret;
 }
 
-
 int check_tsp_type(struct ist30xx_data *data, int tx, int rx)
 {
 	int i;
@@ -1000,7 +996,7 @@ int check_tsp_type(struct ist30xx_data *data, int tx, int rx)
 	TKEY_INFO *tkey = &data->tkey_info;
 
 	if ((tx >= tsp->ch_num.tx) || (tx < 0) ||
-		(rx >= tsp->ch_num.rx) || (rx < 0)) {
+			(rx >= tsp->ch_num.rx) || (rx < 0)) {
 		tsp_warn("TSP channel is not correct!! (%d * %d)\n", tx, rx);
 		return TSP_CH_UNKNOWN;
 	}
@@ -1012,7 +1008,7 @@ int check_tsp_type(struct ist30xx_data *data, int tx, int rx)
 
 		for (i = 0; i < tkey->key_num; i++) {
 			if ((tx == tkey->ch_num[i].tx) &&
-				(rx == tkey->ch_num[i].rx))
+					(rx == tkey->ch_num[i].rx))
 				return TSP_CH_KEY;
 		}
 	} else {
@@ -1075,18 +1071,18 @@ int print_line_cmcs(struct ist30xx_data *data, int mode, s16 *buf16, char *buf)
 				continue;
 
 			if ((mode == CMCS_FLAG_CM_SLOPE0) &&
-				(j == (tsp->screen.rx - 1)))
+					(j == (tsp->screen.rx - 1)))
 				continue;
 			else if ((mode == CMCS_FLAG_CM_SLOPE1) &&
-				 (i == (tsp->screen.tx - 1)))
+					(i == (tsp->screen.tx - 1)))
 				continue;
 
 			if ((mode == CMCS_FLAG_CM_SLOPE0) && (type == TSP_CH_GTX) &&
-				(j == (tsp->screen.rx - 1)))
+					(j == (tsp->screen.rx - 1)))
 				continue;
 			else if ((mode == CMCS_FLAG_CM_SLOPE1) &&
-				 (type == TSP_CH_GTX) &&
-				 (i == tsp->gtx.ch_num[tsp->gtx.num - 1]))
+					(type == TSP_CH_GTX) &&
+					(i == tsp->gtx.ch_num[tsp->gtx.num - 1]))
 				continue;
 
 			idx = (i * rx_num) + j;
@@ -1154,12 +1150,12 @@ ssize_t ist30xx_cmcs_info_show(struct device *dev,
 		if (!strcmp(ts_cmcs->items.item[i].name, CMCS_CS)) {
 			if (!strcmp(ts_cmcs->items.item[i].spec_type, "T")) {
 				count += sprintf(msg, "%d %d %d %d %d %d ",
-						 ts_cmcs->spec_item[i].spec_total.screen_min,
-						 ts_cmcs->spec_item[i].spec_total.screen_max,
-						 ts_cmcs->spec_item[i].spec_total.gtx_min,
-						 ts_cmcs->spec_item[i].spec_total.gtx_max,
-						 ts_cmcs->spec_item[i].spec_total.key_min,
-						 ts_cmcs->spec_item[i].spec_total.key_max);
+						ts_cmcs->spec_item[i].spec_total.screen_min,
+						ts_cmcs->spec_item[i].spec_total.screen_max,
+						ts_cmcs->spec_item[i].spec_total.gtx_min,
+						ts_cmcs->spec_item[i].spec_total.gtx_max,
+						ts_cmcs->spec_item[i].spec_total.key_min,
+						ts_cmcs->spec_item[i].spec_total.key_max);
 				strcat(buf, msg);
 			}
 		}
@@ -1177,12 +1173,12 @@ ssize_t ist30xx_cmcs_info_show(struct device *dev,
 		if (!strcmp(ts_cmcs->items.item[i].name, CMCS_CMJIT)) {
 			if (!strcmp(ts_cmcs->items.item[i].spec_type, "T")) {
 				count += sprintf(msg, "%d %d %d %d %d %d ",
-						 ts_cmcs->spec_item[i].spec_total.screen_min,
-						 ts_cmcs->spec_item[i].spec_total.screen_max,
-						 ts_cmcs->spec_item[i].spec_total.gtx_min,
-						 ts_cmcs->spec_item[i].spec_total.gtx_max,
-						 ts_cmcs->spec_item[i].spec_total.key_min,
-						 ts_cmcs->spec_item[i].spec_total.key_max);
+						ts_cmcs->spec_item[i].spec_total.screen_min,
+						ts_cmcs->spec_item[i].spec_total.screen_max,
+						ts_cmcs->spec_item[i].spec_total.gtx_min,
+						ts_cmcs->spec_item[i].spec_total.gtx_max,
+						ts_cmcs->spec_item[i].spec_total.key_min,
+						ts_cmcs->spec_item[i].spec_total.key_max);
 				strcat(buf, msg);
 			}
 		}
@@ -1195,7 +1191,7 @@ ssize_t ist30xx_cmcs_info_show(struct device *dev,
 
 /* sysfs: /sys/class/touch/cmcs/cmcs_binary */
 ssize_t ist30xx_cmcs_binary_show(struct device *dev,
-				 struct device_attribute *attr, char *buf)
+		struct device_attribute *attr, char *buf)
 {
 	int ret;
 	struct ist30xx_data *data = dev_get_drvdata(dev);
@@ -1217,7 +1213,7 @@ binary_end:
 
 /* sysfs: /sys/class/touch/cmcs/cmcs_custom */
 ssize_t ist30xx_cmcs_custom_show(struct device *dev,
-				 struct device_attribute *attr, char *buf)
+		struct device_attribute *attr, char *buf)
 {
 	int ret;
 	int bin_size = 0;
@@ -1249,7 +1245,7 @@ custom_end:
 #define MAX_FILE_PATH   255
 /* sysfs: /sys/class/touch/cmcs/cmcs_sdcard */
 ssize_t ist30xx_cmcs_sdcard_show(struct device *dev,
-				 struct device_attribute *attr, char *buf)
+		 struct device_attribute *attr, char *buf)
 {
 	int ret = 0;
 	int bin_size = 0;
@@ -1265,7 +1261,7 @@ ssize_t ist30xx_cmcs_sdcard_show(struct device *dev,
 	set_fs(get_ds());
 
 	snprintf(fw_path, MAX_FILE_PATH, "/sdcard/%s",
-		 IST30XX_CMCS_NAME);
+			IST30XX_CMCS_NAME);
 	fp = filp_open(fw_path, O_RDONLY, 0);
 	if (IS_ERR(fp)) {
 		tsp_info("file %s open error:%d\n", fw_path, PTR_ERR(fp));
@@ -1321,7 +1317,7 @@ sdcard_end:
 
 /* sysfs: /sys/class/touch/cmcs/cm_jit */
 ssize_t ist30xx_cm_jit_show(struct device *dev, struct device_attribute *attr,
-				char *buf)
+		char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 	TSP_INFO *tsp = &data->tsp_info;
@@ -1336,7 +1332,7 @@ ssize_t ist30xx_cm_jit_show(struct device *dev, struct device_attribute *attr,
 
 /* sysfs: /sys/class/touch/cmcs/cm */
 ssize_t ist30xx_cm_show(struct device *dev, struct device_attribute *attr,
-			char *buf)
+		char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 	TSP_INFO *tsp = &data->tsp_info;
@@ -1351,7 +1347,7 @@ ssize_t ist30xx_cm_show(struct device *dev, struct device_attribute *attr,
 
 /* sysfs: /sys/class/touch/cmcs/cm_spec_min */
 ssize_t ist30xx_cm_spec_min_show(struct device *dev,
-				 struct device_attribute *attr, char *buf)
+		 struct device_attribute *attr, char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 	TSP_INFO *tsp = &data->tsp_info;
@@ -1366,7 +1362,7 @@ ssize_t ist30xx_cm_spec_min_show(struct device *dev,
 
 /* sysfs: /sys/class/touch/cmcs/cm_spec_max */
 ssize_t ist30xx_cm_spec_max_show(struct device *dev,
-				 struct device_attribute *attr, char *buf)
+		 struct device_attribute *attr, char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 	TSP_INFO *tsp = &data->tsp_info;
@@ -1381,7 +1377,7 @@ ssize_t ist30xx_cm_spec_max_show(struct device *dev,
 
 /* sysfs: /sys/class/touch/cmcs/cm_slope0 */
 ssize_t ist30xx_cm_slope0_show(struct device *dev,
-				   struct device_attribute *attr, char *buf)
+		struct device_attribute *attr, char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 	TSP_INFO *tsp = &data->tsp_info;
@@ -1396,7 +1392,7 @@ ssize_t ist30xx_cm_slope0_show(struct device *dev,
 
 /* sysfs: /sys/class/touch/cmcs/cm_slope1 */
 ssize_t ist30xx_cm_slope1_show(struct device *dev,
-				   struct device_attribute *attr, char *buf)
+		   struct device_attribute *attr, char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 	TSP_INFO *tsp = &data->tsp_info;
@@ -1411,7 +1407,7 @@ ssize_t ist30xx_cm_slope1_show(struct device *dev,
 
 /* sysfs: /sys/class/touch/cmcs/cm2 */
 ssize_t ist30xx_cm2_show(struct device *dev, struct device_attribute *attr,
-			char *buf)
+		char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 	TSP_INFO *tsp = &data->tsp_info;
@@ -1426,7 +1422,7 @@ ssize_t ist30xx_cm2_show(struct device *dev, struct device_attribute *attr,
 
 /* sysfs: /sys/class/touch/cmcs/cs */
 ssize_t ist30xx_cs_show(struct device *dev, struct device_attribute *attr,
-			char *buf)
+		char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 	TSP_INFO *tsp = &data->tsp_info;
@@ -1441,7 +1437,7 @@ ssize_t ist30xx_cs_show(struct device *dev, struct device_attribute *attr,
 
 /* sysfs: /sys/class/touch/cmcs/cs_tx */
 ssize_t ist30xx_cs_tx_show(struct device *dev, struct device_attribute *attr,
-			char *buf)
+		char *buf)
 {
 	int i;
 	int count = 0;
@@ -1453,7 +1449,7 @@ ssize_t ist30xx_cs_tx_show(struct device *dev, struct device_attribute *attr,
 		return sprintf(buf, "CMCS test is not work!!\n");
 
 	for (i = 0; i < tsp->ch_num.tx; i++) {
-		   count += sprintf(msg, "%5d ", (ts_cmcs_buf->cs_tx_result >> i) & 1);
+		count += sprintf(msg, "%5d ", (ts_cmcs_buf->cs_tx_result >> i) & 1);
 		strcat(buf, msg);
 	}
 
@@ -1465,7 +1461,7 @@ ssize_t ist30xx_cs_tx_show(struct device *dev, struct device_attribute *attr,
 
 /* sysfs: /sys/class/touch/cmcs/cs_rx */
 ssize_t ist30xx_cs_rx_show(struct device *dev, struct device_attribute *attr,
-			char *buf)
+		char *buf)
 {
 	int i;
 	int count = 0;
@@ -1477,7 +1473,7 @@ ssize_t ist30xx_cs_rx_show(struct device *dev, struct device_attribute *attr,
 		return sprintf(buf, "CMCS test is not work!!\n");
 
 	for (i = 0; i < tsp->ch_num.rx; i++) {
-		   count += sprintf(msg, "%5d ", (ts_cmcs_buf->cs_rx_result >> i) & 1);
+		count += sprintf(msg, "%5d ", (ts_cmcs_buf->cs_rx_result >> i) & 1);
 		strcat(buf, msg);
 	}
 
@@ -1488,7 +1484,7 @@ ssize_t ist30xx_cs_rx_show(struct device *dev, struct device_attribute *attr,
 }
 
 int print_cm_slope_result(struct ist30xx_data *data, u8 flag, s16 *buf16,
-			  char *buf, bool fail_list)
+		char *buf, bool fail_list)
 {
 	int i, j;
 	int type, idx;
@@ -1499,7 +1495,7 @@ int print_cm_slope_result(struct ist30xx_data *data, u8 flag, s16 *buf16,
 
 	TSP_INFO *tsp = &data->tsp_info;
 	struct CMCS_SPEC_SLOPE *spec =
-		(struct CMCS_SPEC_SLOPE *)&ts_cmcs->spec_slope;
+			(struct CMCS_SPEC_SLOPE *)&ts_cmcs->spec_slope;
 
 	if (flag == CMCS_FLAG_CM_SLOPE0) {
 		min_spec = spec->x_min;
@@ -1529,7 +1525,7 @@ int print_cm_slope_result(struct ist30xx_data *data, u8 flag, s16 *buf16,
 
 			type = check_tsp_type(data, i, j);
 			if ((type == TSP_CH_UNKNOWN) || (type == TSP_CH_UNUSED) ||
-				(type == TSP_CH_KEY))
+					(type == TSP_CH_KEY))
 				continue;
 
 			if (type == TSP_CH_SCREEN) {
@@ -1537,7 +1533,7 @@ int print_cm_slope_result(struct ist30xx_data *data, u8 flag, s16 *buf16,
 					continue;
 			} else if (type == TSP_CH_GTX) {
 				if ((buf16[idx] >= gtx_min_spec) &&
-					(buf16[idx] <= gtx_max_spec))
+						(buf16[idx] <= gtx_max_spec))
 					continue;
 			}
 
@@ -1561,7 +1557,7 @@ int print_cm_slope_result(struct ist30xx_data *data, u8 flag, s16 *buf16,
 }
 
 int print_cm_key_slope_result(struct ist30xx_data *data, s16 *buf16, char *buf,
-				  bool print)
+		bool print)
 {
 	int i, j;
 	int type, idx;
@@ -1575,7 +1571,7 @@ int print_cm_key_slope_result(struct ist30xx_data *data, s16 *buf16, char *buf,
 
 	TSP_INFO *tsp = &data->tsp_info;
 	struct CMCS_SPEC_SLOPE *spec =
-		(struct CMCS_SPEC_SLOPE *)&ts_cmcs->spec_slope;
+			(struct CMCS_SPEC_SLOPE *)&ts_cmcs->spec_slope;
 
 	min_spec = spec->key_min;
 	max_spec = spec->key_max;
@@ -1605,7 +1601,7 @@ int print_cm_key_slope_result(struct ist30xx_data *data, s16 *buf16, char *buf,
 			count += sprintf(msg, "Fail (%d)\n", slope_result);
 	} else {
 		count += sprintf(msg, "%d\n",
-				 (slope_result >= 0 ? slope_result : -slope_result));
+				(slope_result >= 0 ? slope_result : -slope_result));
 	}
 
 	strcat(buf, msg);
@@ -1659,7 +1655,7 @@ int print_cm_result(struct ist30xx_data *data, char *buf, bool fail_list)
 }
 
 int print_total_result(struct ist30xx_data *data, s16 *buf16, char *buf,
-			   const char *mode, bool fail_list)
+		const char *mode, bool fail_list)
 {
 	int i, j;
 	bool success = false;
@@ -1675,7 +1671,7 @@ int print_total_result(struct ist30xx_data *data, s16 *buf16, char *buf,
 		if (!strcmp(ts_cmcs->items.item[i].name, mode)) {
 			if (!strcmp(ts_cmcs->items.item[i].spec_type, "T")) {
 				spec =
-					(struct CMCS_SPEC_TOTAL *)&ts_cmcs->spec_item[i].spec_total;
+						(struct CMCS_SPEC_TOTAL *)&ts_cmcs->spec_item[i].spec_total;
 				success = true;
 				break;
 			}
@@ -1735,7 +1731,7 @@ int print_total_result(struct ist30xx_data *data, s16 *buf16, char *buf,
 
 /* sysfs: /sys/class/touch/cmcs/cm_jit_result */
 ssize_t ist30xx_cm_jit_result_show(struct device *dev,
-				   struct device_attribute *attr, char *buf)
+		   struct device_attribute *attr, char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -1747,7 +1743,7 @@ ssize_t ist30xx_cm_jit_result_show(struct device *dev,
 
 /* sysfs: /sys/class/touch/cmcs/cm_result */
 ssize_t ist30xx_cm_result_show(struct device *dev,
-				   struct device_attribute *attr, char *buf)
+		   struct device_attribute *attr, char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -1759,7 +1755,7 @@ ssize_t ist30xx_cm_result_show(struct device *dev,
 
 /* sysfs: /sys/class/touch/cmcs/cm_slope0_result */
 ssize_t ist30xx_cm_slope0_result_show(struct device *dev,
-					  struct device_attribute *attr, char *buf)
+		  struct device_attribute *attr, char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -1767,12 +1763,12 @@ ssize_t ist30xx_cm_slope0_result_show(struct device *dev,
 		return sprintf(buf, "CMCS test is not work!!\n");
 
 	return print_cm_slope_result(data, CMCS_FLAG_CM_SLOPE0,
-					 ts_cmcs_buf->slope0, buf, true);
+			 ts_cmcs_buf->slope0, buf, true);
 }
 
 /* sysfs: /sys/class/touch/cmcs/cm_slope1_result */
 ssize_t ist30xx_cm_slope1_result_show(struct device *dev,
-					  struct device_attribute *attr, char *buf)
+		  struct device_attribute *attr, char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -1780,12 +1776,12 @@ ssize_t ist30xx_cm_slope1_result_show(struct device *dev,
 		return sprintf(buf, "CMCS test is not work!!\n");
 
 	return print_cm_slope_result(data, CMCS_FLAG_CM_SLOPE1,
-					 ts_cmcs_buf->slope1, buf, true);
+			 ts_cmcs_buf->slope1, buf, true);
 }
 
 /* sysfs: /sys/class/touch/cmcs/cm_key_slope_result */
 ssize_t ist30xx_cm_key_slope_result_show(struct device *dev,
-					 struct device_attribute *attr, char *buf)
+			 struct device_attribute *attr, char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -1797,7 +1793,7 @@ ssize_t ist30xx_cm_key_slope_result_show(struct device *dev,
 
 /* sysfs: /sys/class/touch/cmcs/cs_result */
 ssize_t ist30xx_cs_result_show(struct device *dev,
-				   struct device_attribute *attr, char *buf)
+		   struct device_attribute *attr, char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -1809,7 +1805,7 @@ ssize_t ist30xx_cs_result_show(struct device *dev,
 
 /* sysfs: /sys/class/touch/cmcs/line_cm_jit */
 ssize_t ist30xx_line_cm_jit_show(struct device *dev,
-				 struct device_attribute *attr, char *buf)
+		 struct device_attribute *attr, char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -1821,7 +1817,7 @@ ssize_t ist30xx_line_cm_jit_show(struct device *dev,
 
 /* sysfs: /sys/class/touch/cmcs/line_cm */
 ssize_t ist30xx_line_cm_show(struct device *dev,
-				 struct device_attribute *attr, char *buf)
+		 struct device_attribute *attr, char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -1833,7 +1829,7 @@ ssize_t ist30xx_line_cm_show(struct device *dev,
 
 /* sysfs: /sys/class/touch/cmcs/line_cm_slope0 */
 ssize_t ist30xx_line_cm_slope0_show(struct device *dev,
-					struct device_attribute *attr, char *buf)
+		struct device_attribute *attr, char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -1845,7 +1841,7 @@ ssize_t ist30xx_line_cm_slope0_show(struct device *dev,
 
 /* sysfs: /sys/class/touch/cmcs/line_cm_slope1 */
 ssize_t ist30xx_line_cm_slope1_show(struct device *dev,
-					struct device_attribute *attr, char *buf)
+		struct device_attribute *attr, char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -1857,7 +1853,7 @@ ssize_t ist30xx_line_cm_slope1_show(struct device *dev,
 
 /* sysfs: /sys/class/touch/cmcs/line_cm2 */
 ssize_t ist30xx_line_cm2_show(struct device *dev,
-				 struct device_attribute *attr, char *buf)
+		 struct device_attribute *attr, char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -1869,7 +1865,7 @@ ssize_t ist30xx_line_cm2_show(struct device *dev,
 
 /* sysfs: /sys/class/touch/cmcs/line_cs */
 ssize_t ist30xx_line_cs_show(struct device *dev,
-				 struct device_attribute *attr, char *buf)
+		 struct device_attribute *attr, char *buf)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
 
@@ -1881,7 +1877,7 @@ ssize_t ist30xx_line_cs_show(struct device *dev,
 
 /* sysfs: /sys/class/touch/cmcs/cm_key_slope_value */
 ssize_t ist30xx_cm_key_slope_value_show(struct device *dev,
-					struct device_attribute *attr, char *buf)
+		struct device_attribute *attr, char *buf)
 {
 	int ret;
 	struct ist30xx_data *data = dev_get_drvdata(dev);
@@ -2091,7 +2087,7 @@ int ist30xx_init_cmcs_sysfs(struct ist30xx_data *data)
 
 	/* /sys/class/touch/cmcs/... */
 	if (unlikely(sysfs_create_group(&ist30xx_cmcs_dev->kobj,
-					&cmcs_attr_group)))
+			&cmcs_attr_group)))
 		tsp_err("Failed to create sysfs group(%s)!\n", "cmcs");
 
 #ifdef INTERNAL_CMCS_BIN

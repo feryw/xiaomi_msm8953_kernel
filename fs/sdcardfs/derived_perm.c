@@ -37,8 +37,8 @@ static void inherit_derived_state(struct inode *parent, struct inode *child)
 
 /* helper function for derived state */
 void setup_derived_state(struct inode *inode, perm_t perm, userid_t userid,
-					uid_t uid, bool under_android,
-					struct sdcardfs_inode_data *top)
+		uid_t uid, bool under_android,
+		struct sdcardfs_inode_data *top)
 {
 	struct sdcardfs_inode_info *info = SDCARDFS_I(inode);
 
@@ -55,7 +55,7 @@ void setup_derived_state(struct inode *inode, perm_t perm, userid_t userid,
  * but the name from newdentry
  */
 void get_derived_permission_new(struct dentry *parent, struct dentry *dentry,
-				const struct qstr *name)
+		const struct qstr *name)
 {
 	struct sdcardfs_inode_info *info = SDCARDFS_I(dentry->d_inode);
 	struct sdcardfs_inode_data *parent_data =
@@ -176,9 +176,6 @@ void fixup_lower_ownership(struct dentry *dentry, const char *name)
 	gid_t gid = sbi->options.fs_low_gid;
 	struct iattr newattrs;
 
-	if (!sbi->options.gid_derivation)
-		return;
-
 	info = SDCARDFS_I(dentry->d_inode);
 	info_d = info->data;
 	perm = info_d->perm;
@@ -288,11 +285,6 @@ static void __fixup_perms_recursive(struct dentry *dentry, struct limit_search *
 	struct dentry *child;
 	struct sdcardfs_inode_info *info;
 
-	/*
-	 * All paths will terminate their recursion on hitting PERM_ANDROID_OBB,
-	 * PERM_ANDROID_MEDIA, or PERM_ANDROID_DATA. This happens at a depth of
-	 * at most 3.
-	 */
 	WARN(depth > 3, "%s: Max expected depth exceeded!\n", __func__);
 	spin_lock_nested(&dentry->d_lock, depth);
 	if (!dentry->d_inode) {
@@ -318,6 +310,8 @@ static void __fixup_perms_recursive(struct dentry *dentry, struct limit_search *
 		list_for_each_entry(child, &dentry->d_subdirs, d_child) {
 			__fixup_perms_recursive(child, limit, depth + 1);
 		}
+		if (error)
+			pr_debug("sdcardfs: Failed to touch up lower fs gid/uid for %s\n", name);
 	}
 	spin_unlock(&dentry->d_lock);
 }

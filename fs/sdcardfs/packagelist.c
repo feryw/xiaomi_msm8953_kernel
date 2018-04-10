@@ -159,8 +159,8 @@ int check_caller_access_to_name(struct inode *parent_node, const struct qstr *na
 	/* Always block security-sensitive files at root */
 	if (parent_node && SDCARDFS_I(parent_node)->data->perm == PERM_ROOT) {
 		if (qstr_case_eq(name, &q_autorun)
-			|| qstr_case_eq(name, &q__android_secure)
-			|| qstr_case_eq(name, &q_android_secure)) {
+				|| qstr_case_eq(name, &q__android_secure)
+				|| qstr_case_eq(name, &q_android_secure)) {
 			return 0;
 		}
 	}
@@ -355,7 +355,7 @@ static void remove_packagelist_entry_locked(const struct qstr *key)
 	}
 	synchronize_rcu();
 	hlist_for_each_entry_safe(hash_cur, h_t, &free_list, dlist)
-		free_hashtable_entry(hash_cur);
+			free_hashtable_entry(hash_cur);
 }
 
 static void remove_packagelist_entry(const struct qstr *key)
@@ -457,7 +457,7 @@ static void packagelist_destroy(void)
 	}
 	synchronize_rcu();
 	hlist_for_each_entry_safe(hash_cur, h_t, &free_list, dlist)
-		free_hashtable_entry(hash_cur);
+			free_hashtable_entry(hash_cur);
 	mutex_unlock(&sdcardfs_super_list_lock);
 	pr_info("sdcardfs: destroyed packagelist pkgld\n");
 }
@@ -502,7 +502,7 @@ static ssize_t package_details_appid_store(struct package_details *package_detai
 }
 
 static ssize_t package_details_excluded_userids_show(struct package_details *package_details,
-				      char *page)
+		char *page)
 {
 	struct hashtable_entry *hash_cur;
 	unsigned int hash = package_details->name.hash;
@@ -512,7 +512,7 @@ static ssize_t package_details_excluded_userids_show(struct package_details *pac
 	hash_for_each_possible_rcu(package_to_userid, hash_cur, hlist, hash) {
 		if (qstr_case_eq(&package_details->name, &hash_cur->key))
 			count += scnprintf(page + count, PAGE_SIZE - count,
-					"%d ", atomic_read(&hash_cur->value));
+				"%d ", atomic_read(&hash_cur->value));
 	}
 	rcu_read_unlock();
 	if (count)
@@ -522,7 +522,7 @@ static ssize_t package_details_excluded_userids_show(struct package_details *pac
 }
 
 static ssize_t package_details_excluded_userids_store(struct package_details *package_details,
-				       const char *page, size_t count)
+		const char *page, size_t count)
 {
 	unsigned int tmp;
 	int ret;
@@ -540,7 +540,7 @@ static ssize_t package_details_excluded_userids_store(struct package_details *pa
 }
 
 static ssize_t package_details_clear_userid_store(struct package_details *package_details,
-				       const char *page, size_t count)
+		const char *page, size_t count)
 {
 	unsigned int tmp;
 	int ret;
@@ -683,7 +683,7 @@ static struct config_group *extensions_make_group(struct config_group *group, co
 
 	extensions_value->num = tmp;
 	config_group_init_type_name(&extensions_value->group, name,
-						&extensions_name_type);
+			&extensions_name_type);
 	return &extensions_value->group;
 }
 
@@ -742,13 +742,13 @@ static struct config_item *packages_make_item(struct config_group *group, const 
 	}
 	qstr_init(&package_details->name, tmp);
 	config_item_init_type_name(&package_details->item, name,
-						&package_appid_type);
+			&package_appid_type);
 
 	return &package_details->item;
 }
 
 static ssize_t packages_list_show(struct packages *packages,
-					 char *page)
+			char *page)
 {
 	struct hashtable_entry *hash_cur_app;
 	struct hashtable_entry *hash_cur_user;
@@ -760,13 +760,13 @@ static ssize_t packages_list_show(struct packages *packages,
 	rcu_read_lock();
 	hash_for_each_rcu(package_to_appid, i, hash_cur_app, hlist) {
 		written = scnprintf(page + count, PAGE_SIZE - sizeof(errormsg) - count, "%s %d\n",
-					hash_cur_app->key.name, atomic_read(&hash_cur_app->value));
+				hash_cur_app->key.name, atomic_read(&hash_cur_app->value));
 		hash = hash_cur_app->key.hash;
 		hash_for_each_possible_rcu(package_to_userid, hash_cur_user, hlist, hash) {
 			if (qstr_case_eq(&hash_cur_app->key, &hash_cur_user->key)) {
 				written += scnprintf(page + count + written - 1,
-					PAGE_SIZE - sizeof(errormsg) - count - written + 1,
-					" %d\n", atomic_read(&hash_cur_user->value)) - 1;
+						PAGE_SIZE - sizeof(errormsg) - count - written + 1,
+						" %d\n", atomic_read(&hash_cur_user->value)) - 1;
 			}
 		}
 		if (count + written == PAGE_SIZE - sizeof(errormsg) - 1) {
@@ -781,7 +781,7 @@ static ssize_t packages_list_show(struct packages *packages,
 }
 
 static ssize_t packages_remove_userid_store(struct packages *packages,
-				       const char *page, size_t count)
+		const char *page, size_t count)
 {
 	unsigned int tmp;
 	int ret;

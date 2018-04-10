@@ -1,5 +1,5 @@
 /* Copyright (C) 2012 by Xiang Xiao <xiaoxiang@xiaomi.com>
- * Copyright (C) 2017 XiaoMi, Inc.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -144,16 +144,16 @@ static enum hrtimer_restart gpio_ir_tx_timer(struct hrtimer *timer)
 	enum hrtimer_restart restart = HRTIMER_RESTART;
 
 	if (!gpkt->abort && gpkt->next < gpkt->length) {
-		if (gpkt->next & 0x01) { /* space */
+		if (gpkt->next & 0x01) {
 			gpio_ir_tx_set(gpkt, false);
 
 			hrtimer_forward_now(&gpkt->timer,
-				ns_to_ktime(gpkt->buffer[gpkt->next++]));
+					ns_to_ktime(gpkt->buffer[gpkt->next++]));
 		} else if (!gpkt->pulse || !gpkt->space) {
 			gpio_ir_tx_set(gpkt, true);
 
 			hrtimer_forward_now(&gpkt->timer,
-				ns_to_ktime(gpkt->buffer[gpkt->next++]));
+					ns_to_ktime(gpkt->buffer[gpkt->next++]));
 		} else { /* pulse with soft carrier */
 			unsigned int nsecs;
 
@@ -305,8 +305,8 @@ static int __devinit gpio_ir_tx_probe(struct gpio_ir_dev *gdev)
 		gdev->tx_reg = regulator_get(&gdev->pdev->dev, gdata->tx_reg_id);
 		if (IS_ERR(gdev->tx_reg)) {
 			dev_err(&gdev->pdev->dev,
-				"failed to regulator_get(%s)\n",
-				 gdata->tx_reg_id);
+					"failed to regulator_get(%s)\n",
+					 gdata->tx_reg_id);
 			return PTR_ERR(gdev->tx_reg);
 		}
 	}
@@ -315,18 +315,18 @@ static int __devinit gpio_ir_tx_probe(struct gpio_ir_dev *gdev)
 		rc = gpio_request(gdata->tx_gpio_nr, GPIO_IR_TX_NAME);
 		if (rc < 0) {
 			dev_err(&gdev->pdev->dev,
-				"failed to gpio_request(%u)\n",
-				 gdata->tx_gpio_nr);
+					"failed to gpio_request(%u)\n",
+					gdata->tx_gpio_nr);
 			goto err_gpio_request;
 		}
 
 		rc = gpio_direction_output(
-				 gdata->tx_gpio_nr,
+				gdata->tx_gpio_nr,
 				!gdata->tx_high_active);
 		if (rc < 0) {
 			dev_err(&gdev->pdev->dev,
 				"failed to gpio_direction_output(%u)\n",
-				 gdata->tx_gpio_nr);
+				gdata->tx_gpio_nr);
 			goto err_gpio_direction_output;
 		}
 
@@ -399,14 +399,14 @@ static enum hrtimer_restart gpio_ir_rx_timer(struct hrtimer *timer)
 		rc = ir_raw_event_store(gdev->rdev, &ev);
 		if (rc != 0) {
 			dev_err(&gdev->pdev->dev,
-				"failed to ir_raw_event_store(%d)\n", rc);
+					"failed to ir_raw_event_store(%d)\n", rc);
 		}
 	} else {
 		rc = ir_raw_event_store_edge_with_adjust(gdev->rdev,
 				IR_SPACE, period - GPIO_IR_MAX_CARRIER_NS);
 		if (rc != 0) {
 			dev_err(&gdev->pdev->dev, "failed to "
-				"ir_raw_event_store_edge_with_adjust(%d)\n", rc);
+					"ir_raw_event_store_edge_with_adjust(%d)\n", rc);
 		}
 	}
 
@@ -430,7 +430,7 @@ static irqreturn_t gpio_ir_rx_irq(int irq, void *dev)
 	struct gpio_ir_data *gdata = gdev->pdev->dev.platform_data;
 	int rc = -ENOENT;
 
-	if (gdata->rx_soft_carrier)  {
+	if (gdata->rx_soft_carrier) {
 		if (!hrtimer_active(&gdev->rx_timer)) {
 			gdev->rx_carrier_last  = ktime_get();
 			gdev->rx_carrier_count = 0;
@@ -438,16 +438,16 @@ static irqreturn_t gpio_ir_rx_irq(int irq, void *dev)
 				rc = ir_raw_event_store_edge(gdev->rdev, IR_PULSE);
 				if (rc != 0) {
 					dev_err(&gdev->pdev->dev, "failed to "
-						"ir_raw_event_store_edge(%d, %d)\n",
-						 IR_PULSE, rc);
+							"ir_raw_event_store_edge(%d, %d)\n",
+							IR_PULSE, rc);
 				}
 			}
 		}
 
 		gdev->rx_carrier_count++;
 		hrtimer_start(&gdev->rx_timer,
-			ns_to_ktime(GPIO_IR_MAX_CARRIER_NS),
-			HRTIMER_MODE_REL);
+				ns_to_ktime(GPIO_IR_MAX_CARRIER_NS),
+				HRTIMER_MODE_REL);
 	} else {
 		enum raw_event_type type;
 
@@ -455,8 +455,8 @@ static irqreturn_t gpio_ir_rx_irq(int irq, void *dev)
 		rc = ir_raw_event_store_edge(gdev->rdev, type);
 		if (rc != 0) {
 			dev_err(&gdev->pdev->dev, "failed to "
-				"ir_raw_event_store_edge(%d, %d)\n",
-				 type, rc);
+					"ir_raw_event_store_edge(%d, %d)\n",
+					type, rc);
 		}
 	}
 
@@ -479,8 +479,8 @@ static int __devinit gpio_ir_rx_probe(struct gpio_ir_dev *gdev)
 		gdev->rx_reg = regulator_get(&gdev->pdev->dev, gdata->rx_reg_id);
 		if (IS_ERR(gdev->rx_reg)) {
 			dev_err(&gdev->pdev->dev,
-				"failed to regulator_get(%s)\n",
-				 gdata->rx_reg_id);
+					"failed to regulator_get(%s)\n",
+					gdata->rx_reg_id);
 			return PTR_ERR(gdev->rx_reg);
 		}
 	}
@@ -489,34 +489,34 @@ static int __devinit gpio_ir_rx_probe(struct gpio_ir_dev *gdev)
 		rc = gpio_request(gdata->rx_gpio_nr, GPIO_IR_RX_NAME);
 		if (rc < 0) {
 			dev_err(&gdev->pdev->dev,
-				"failed to gpio_request(%u)\n",
-				 gdata->rx_gpio_nr);
+					"failed to gpio_request(%u)\n",
+					gdata->rx_gpio_nr);
 			goto err_gpio_request;
 		}
 
 		rc = gpio_direction_input(gdata->rx_gpio_nr);
 		if (rc < 0) {
 			dev_err(&gdev->pdev->dev,
-				"failed to gpio_direction_input(%u)\n",
-				 gdata->rx_gpio_nr);
+					"failed to gpio_direction_input(%u)\n",
+					gdata->rx_gpio_nr);
 			goto err_gpio_direction_input;
 		}
 
 		flags = IRQF_TRIGGER_FALLING | IRQF_TRIGGER_RISING | IRQF_DISABLED;
 		rc = request_irq(gpio_to_irq(gdata->rx_gpio_nr),
-				 gpio_ir_rx_irq, flags, GPIO_IR_RX_NAME, gdev);
+				gpio_ir_rx_irq, flags, GPIO_IR_RX_NAME, gdev);
 		if (rc < 0) {
 			dev_err(&gdev->pdev->dev,
-				"failed to request_irq(%d)\n",
-				 gpio_to_irq(gdata->rx_gpio_nr));
+					"failed to request_irq(%d)\n",
+					gpio_to_irq(gdata->rx_gpio_nr));
 			goto err_request_irq;
 		}
 
 		rc = device_init_wakeup(&gdev->pdev->dev, gdata->rx_can_wakeup);
 		if (rc < 0) {
 			dev_err(&gdev->pdev->dev,
-				"failed to device_init_wakeup(%d)\n",
-				 gdata->rx_can_wakeup);
+					"failed to device_init_wakeup(%d)\n",
+					gdata->rx_can_wakeup);
 			goto err_device_init_wakeup;
 		}
 
@@ -598,7 +598,7 @@ static int gpio_ir_resume(struct device *dev)
 	if (gdev->rdev->open_count) {
 		if (device_may_wakeup(dev))
 			rc = gpio_ir_rx_wake(gdev, false);
-		 else
+		else
 			rc = gpio_ir_rx_enable(gdev);
 	}
 	mutex_unlock(&gdev->lock);
@@ -641,16 +641,16 @@ static int __devinit gpio_ir_probe(struct platform_device *pdev)
 				of_property_read_string(pdev->dev.of_node, "rx-map-name", &gdata->rx_map_name);
 
 				dev_info(&pdev->dev,
-					 "tx-reg-id = %s, tx-gpio-nr = %d, tx-high-active = %d, "
-					 "tx-soft-carrier = %d, tx-disable-rx = %d, tx-with-timer = %d\n",
-					  gdata->tx_reg_id, gdata->tx_gpio_nr, gdata->tx_high_active,
-					  gdata->tx_soft_carrier, gdata->tx_disable_rx, gdata->tx_with_timer);
+						"tx-reg-id = %s, tx-gpio-nr = %d, tx-high-active = %d, "
+						"tx-soft-carrier = %d, tx-disable-rx = %d, tx-with-timer = %d\n",
+						gdata->tx_reg_id, gdata->tx_gpio_nr, gdata->tx_high_active,
+						gdata->tx_soft_carrier, gdata->tx_disable_rx, gdata->tx_with_timer);
 
 				dev_info(&pdev->dev,
-					 "rx-reg-id = %s, rx-gpio-nr = %d, rx-high-active = %d, rx-soft-carrier = %d, "
-					 "rx-init-protos = %d, rx-can-wakeup = %d, rx-map-name = %d\n",
-					  gdata->rx_reg_id, gdata->rx_gpio_nr, gdata->rx_high_active, gdata->rx_soft_carrier,
-					  gdata->rx_init_protos, gdata->rx_can_wakeup, gdata->rx_map_name);
+						"rx-reg-id = %s, rx-gpio-nr = %d, rx-high-active = %d, rx-soft-carrier = %d, "
+						"rx-init-protos = %d, rx-can-wakeup = %d, rx-map-name = %d\n",
+						gdata->rx_reg_id, gdata->rx_gpio_nr, gdata->rx_high_active, gdata->rx_soft_carrier,
+						gdata->rx_init_protos, gdata->rx_can_wakeup, gdata->rx_map_name);
 			}
 		} else {
 			dev_err(&pdev->dev, "failed to alloc platform data\n");

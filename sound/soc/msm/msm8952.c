@@ -267,7 +267,6 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 	struct snd_soc_card *card = codec->component.card;
 	struct msm8916_asoc_mach_data *pdata = snd_soc_card_get_drvdata(card);
 	int pa_mode = EXT_PA_MODE;
-
 	if (!gpio_is_valid(pdata->spk_ext_pa_gpio)) {
 		pr_err("%s: Invalid gpio: %d\n", __func__,
 			pdata->spk_ext_pa_gpio);
@@ -1535,7 +1534,18 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 	 * 210-290 == Button 2
 	 * 360-680 == Button 3
 	 */
-
+	#if 0
+	btn_low[0] = 277;
+	btn_high[0] = 277;
+	btn_low[1] = 437;
+	btn_high[1] = 437;
+	btn_low[2] = 627;
+	btn_high[2] = 627;
+	btn_low[3] = 627;
+	btn_high[3] = 627;
+	btn_low[4] = 627;
+	btn_high[4] = 627;
+	#else
 	btn_low[0] = 73;
 	btn_high[0] = 73;
 	btn_low[1] = 233;
@@ -1546,6 +1556,7 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 	btn_high[3] = 438;
 	btn_low[4] = 438;
 	btn_high[4] = 438;
+	#endif
 	return msm8952_wcd_cal;
 }
 

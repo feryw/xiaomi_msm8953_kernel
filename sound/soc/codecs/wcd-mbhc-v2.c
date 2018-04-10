@@ -1,5 +1,5 @@
 /* Copyright (c) 2015-2017, The Linux Foundation. All rights reserved.
- * Copyright (C) 2017 XiaoMi, Inc.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -74,6 +74,7 @@ static struct switch_dev accdet_data;
 static void wcd_mbhc_jack_report(struct wcd_mbhc *mbhc,
 				struct snd_soc_jack *jack, int status, int mask)
 {
+	printk("[%s]===========status[%d]type[%d]\n", __FUNCTION__, status, jack->jack->type);
 	if (!status && (jack->jack->type&WCD_MBHC_JACK_MASK)) {
 		switch_set_state(&accdet_data, 0);
 	} else if (jack->jack->type&WCD_MBHC_JACK_MASK) {
@@ -2003,7 +2004,16 @@ static irqreturn_t wcd_mbhc_release_handler(int irq, void *data)
 	 * headset not headphone.
 	 */
 	if (mbhc->current_plug == MBHC_PLUG_TYPE_HEADPHONE) {
+
 		wcd_mbhc_find_plug_and_report(mbhc, MBHC_PLUG_TYPE_HEADSET);
+
+		wcd_mbhc_jack_report(mbhc, &mbhc->headset_jack,
+				0, WCD_MBHC_JACK_MASK);
+		msleep(100);
+
+		wcd_mbhc_report_plug(mbhc, 1, SND_JACK_HEADSET);
+
+
 		goto exit;
 
 	}
@@ -2378,6 +2388,14 @@ int wcd_mbhc_init(struct wcd_mbhc *mbhc, struct snd_soc_codec *codec,
 	const char *gnd_switch = "qcom,msm-mbhc-gnd-swh";
 
 	pr_debug("%s: enter\n", __func__);
+	accdet_data.name = "h2w";
+	accdet_data.index = 0;
+	accdet_data.state = 0;
+	ret = switch_dev_register(&accdet_data);
+	if (ret) {
+		dev_err(card->dev, "[Accdet]switch_dev_register returned:%d!\n", ret);
+		return -EPERM;
+	}
 
 	accdet_data.name = "h2w";
 	accdet_data.index = 0;

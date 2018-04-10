@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 2010,Imagis Technology Co. Ltd. All Rights Reserved.
- *  Copyright (C) 2017 XiaoMi, Inc.
+ *  Copyright (C) 2018 XiaoMi, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@
 #include <linux/fb.h>
 #endif
 
+#include <linux/hqsysfs.h>
 
 
 #include "ist30xxc.h"
@@ -441,7 +442,7 @@ int ist30xx_get_info(struct ist30xx_data *data)
 #endif /* IST30XX_INTERNAL_BIN */
 
 	ret = ist30xx_set_input_device(data);
-	   if (unlikely(ret))
+	if (unlikely(ret))
 		goto err_get_info;
 
 	ist30xx_print_info(data);
@@ -1066,9 +1067,9 @@ static irqreturn_t ist30xx_irq_thread(int irq, void *ptr)
 			if (data->cal_ref_count < IST30XX_MAX_CAL_REF_CNT) {
 				result = CAL_REF_TO_STATUS(data->status.cal_ref_msg);
 				if ((result & CAL_REF_NONE) ||
-						    (result & CAL_REF_FAIL_UNKNOWN) ||
-						    (result & CAL_REF_FAIL_CRC) ||
-						    (result & CAL_REF_FAIL_VERIFY))
+						(result & CAL_REF_FAIL_UNKNOWN) ||
+						(result & CAL_REF_FAIL_CRC) ||
+						(result & CAL_REF_FAIL_VERIFY))
 					ist30xx_scheduled_cal_ref(data);
 			}
 		}
@@ -1092,13 +1093,13 @@ static irqreturn_t ist30xx_irq_thread(int irq, void *ptr)
 #if (defined(IST30XX_GESTURE) || defined(IST30XX_SURFACE_TOUCH) ||  \
 		defined(IST30XX_BLADE_TOUCH))
 	if (ist30xx_gesture_func_on) {
-	ret = PARSE_SPECIAL_MESSAGE(*msg);
-	if (unlikely(ret > 0)) {
-		tsp_verb("special cmd: %d (0x%08X)\n", ret, *msg);
-		ist30xx_special_cmd(data, ret);
+		ret = PARSE_SPECIAL_MESSAGE(*msg);
+		if (unlikely(ret > 0)) {
+			tsp_verb("special cmd: %d (0x%08X)\n", ret, *msg);
+			ist30xx_special_cmd(data, ret);
 
-		goto irq_event;
-			}
+			goto irq_event;
+		}
 	}
 #endif
 
@@ -1113,7 +1114,7 @@ static irqreturn_t ist30xx_irq_thread(int irq, void *ptr)
 	finger_cnt = PARSE_FINGER_CNT(t_status);
 
 	if (unlikely((finger_cnt > data->max_fingers) ||
-				(key_cnt > data->max_keys))) {
+			(key_cnt > data->max_keys))) {
 		tsp_warn("Invalid touch count - finger: %d(%d), key: %d(%d)\n",
 				finger_cnt, data->max_fingers, key_cnt, data->max_keys);
 		goto irq_err;
@@ -1248,7 +1249,7 @@ static int ist30xx_power_init(struct ist30xx_data *data)
 	ret = regulator_enable(data->vddio);
 	if (ret) {
 		tsp_err("Regulator vddio enable failed rc=%d\n", ret);
-	    return ret;
+		return ret;
 	}
 
 	return 0;
@@ -1335,14 +1336,15 @@ static int ist30xx_suspend(struct device *dev)
 			if (device_may_wakeup(&data->client->dev))
 				enable_irq_wake(data->client->irq);
 		}
-	} else {
+	}
+	else {
 #endif
 
-	if (data->pinctrl) {
-		ret = pinctrl_select_state(data->pinctrl, data->pinctrl_state_suspend);
-		if (ret < 0)
-			tsp_err("cannot get suspend pinctrl state\n");
-	}
+		if (data->pinctrl) {
+			ret = pinctrl_select_state(data->pinctrl, data->pinctrl_state_suspend);
+			if (ret < 0)
+				tsp_err("cannot get suspend pinctrl state\n");
+		}
 #ifdef IST30XX_GESTURE
 	}
 #endif
@@ -1364,9 +1366,9 @@ static int ist30xx_resume(struct device *dev)
 
 	mutex_lock(&data->lock);
 #ifdef IST30XX_GESTURE
-	if (ist30xx_gesture_func_on)	{
+	if (ist30xx_gesture_func_on) {
 		if (data->gesture) {
-			 ist30xx_disable_irq(data);
+			ist30xx_disable_irq(data);
 		}
 	}
 #endif
@@ -1377,12 +1379,13 @@ static int ist30xx_resume(struct device *dev)
 #ifdef IST30XX_GESTURE
 
 	if (ist30xx_gesture_func_on) {
-		 if (data->gesture) {
+		if (data->gesture) {
 			if (device_may_wakeup(&data->client->dev))
 				disable_irq_wake(data->client->irq);
 
-		 }
-	} else {
+		}
+	}
+	else {
 #endif
 
 		if (data->pinctrl) {
@@ -1519,7 +1522,7 @@ void ist30xx_set_cover_mode(int mode)
 		data->noise_mode &= ~(1 << NOISE_MODE_COVER);
 
 #ifdef IST30XX_TA_RESET
-	   if (data->initialized)
+	if (data->initialized)
 		ist30xx_scheduled_reset(data);
 #else
 	if (data->initialized && data->status.power)
@@ -1560,7 +1563,7 @@ static void reset_work_func(struct work_struct *work)
 
 	if (likely((data->initialized == 1) && (data->status.power == 1) &&
 			(data->status.update != 1) && (data->status.calib != 1 &&
-				(data->status.calib != 2)))) {
+			(data->status.calib != 2)))) {
 		mutex_lock(&data->lock);
 		ist30xx_disable_irq(data);
 #ifdef IST30XX_GESTURE
@@ -1707,7 +1710,7 @@ static void release_work_func(struct work_struct *work)
 
 	/* Status of IC is idle */
 	if (GET_FINGER_ENABLE(touch_status) == 0)
-			clear_input_data(data);
+		clear_input_data(data);
 }
 #endif
 #endif
@@ -1752,7 +1755,7 @@ void timer_handler(unsigned long timer_data)
 
 	if (status->event_mode) {
 		if (likely((status->power == 1) && (status->update != 1) &&
-					(status->calib != 1))) {
+				(status->calib != 1))) {
 			data->timer_ms = (u32)get_milli_second(data);
 			if (unlikely(status->calib == 2)) {
 				/* Check calibration */
@@ -1867,7 +1870,7 @@ static int ist30xx_parse_dt(struct device *dev, struct ist30xx_data *data)
 static struct proc_dir_entry *ctp_lockdown_status_proc;
 static char tp_lockdown_info[128];
 
-static int ctp_lockdown_proc_show(struct seq_file  *file, void *data)
+static int ctp_lockdown_proc_show(struct seq_file *file, void *data)
 {
 	char temp[40] = {0};
 
@@ -1888,7 +1891,7 @@ static const struct file_operations ctp_lockdown_proc_fops = {
 #endif
 #if defined(CONFIG_FB)
 static int fb_notifier_callback(struct notifier_block *self,
-				 unsigned long event, void *data)
+		 unsigned long event, void *data)
 {
 	struct fb_event *evdata = data;
 	int *blank;
@@ -1906,115 +1909,6 @@ static int fb_notifier_callback(struct notifier_block *self,
 	return 0;
 }
 #endif
-
-
-static ssize_t ist30xx_ts_disable_keys_show(struct device *dev,
-	struct device_attribute *attr, char *buf)
-{
-	const char c = disable_keys_function ? '1' : '0';
-	return sprintf(buf, "%c\n", c);
-}
-
-static ssize_t ist30xx_ts_disable_keys_store(struct device *dev,
-	struct device_attribute *attr, const char *buf, size_t count)
-{
-	int i;
-
-	if (sscanf(buf, "%u", &i) == 1 && i < 2) {
-		disable_keys_function = (i == 1);
-		return count;
-	} else {
-		dev_dbg(dev, "disable_keys write error\n");
-		return -EINVAL;
-	}
-}
-
-
-static DEVICE_ATTR(disable_keys, S_IWUSR | S_IRUSR, ist30xx_ts_disable_keys_show,
-		   ist30xx_ts_disable_keys_store);
-
-
-
-static ssize_t ist30xx_ts_enable_dt2w_show(struct device *dev,
-        struct device_attribute *attr, char *buf)
-{
-        const char c = ist30xx_gesture_func_on ? '1' : '0';
-        return sprintf(buf, "%c\n", c);
-}
-
-static ssize_t ist30xx_ts_enable_dt2w_store(struct device *dev,
-        struct device_attribute *attr, const char *buf, size_t count)
-{
-        int i;
-
-        if (sscanf(buf, "%u", &i) == 1 && i < 2) {
-                ist30xx_gesture_func_on = (i == 1);
-                return count;
-        } else {
-                dev_dbg(dev, "enable_dt2w write error\n");
-                return -EINVAL;
-        }
-}
-
-
-static DEVICE_ATTR(enable_dt2w, S_IWUSR | S_IRUSR, ist30xx_ts_enable_dt2w_show,
-                   ist30xx_ts_enable_dt2w_store);
-
-static struct attribute *ist30xx_ts_attrs[] = {
-    &dev_attr_disable_keys.attr,
-    &dev_attr_enable_dt2w.attr,
-	NULL
-};
-
-
-static const struct attribute_group ist30xx_ts_attr_group = {
-       .attrs = ist30xx_ts_attrs,
-};
-
-static int ist30xx_proc_init(struct kernfs_node *sysfs_node_parent)
-{
-       int ret = 0;
-       char *buf, *path = NULL;
-       char *key_disabler_sysfs_node, *double_tap_sysfs_node;
-       struct proc_dir_entry *proc_entry_tp = NULL;
-       struct proc_dir_entry *proc_symlink_tmp = NULL;
-       buf = kzalloc(PATH_MAX, GFP_KERNEL);
-       if (buf)
-               path = kernfs_path(sysfs_node_parent, buf, PATH_MAX);
-
-       proc_entry_tp = proc_mkdir("touchpanel", NULL);
-       if (proc_entry_tp == NULL) {
-               pr_err("%s: Couldn't create touchpanel dir in procfs\n", __func__);
-               ret = -ENOMEM;
-       }
-
-       key_disabler_sysfs_node = kzalloc(PATH_MAX, GFP_KERNEL);
-       if (key_disabler_sysfs_node)
-               sprintf(key_disabler_sysfs_node, "/sys%s/%s", path, "disable_keys");
-       proc_symlink_tmp = proc_symlink("capacitive_keys_disable",
-                       proc_entry_tp, key_disabler_sysfs_node);
-       if (proc_symlink_tmp == NULL) {
-               pr_err("%s: Couldn't create capacitive_keys_enable symlink\n", __func__);
-               ret = -ENOMEM;
-       }
-
-       double_tap_sysfs_node = kzalloc(PATH_MAX, GFP_KERNEL);
-       if (double_tap_sysfs_node)
-               sprintf(double_tap_sysfs_node, "/sys%s/%s", path, "enable_dt2w");
-       proc_symlink_tmp = proc_symlink("enable_dt2w",
-               proc_entry_tp, double_tap_sysfs_node);
-       if (proc_symlink_tmp == NULL) {
-               ret = -ENOMEM;
-               pr_err("%s: Couldn't create double_tap_enable symlink\n", __func__);
-       }
-
-       kfree(buf);
-       kfree(key_disabler_sysfs_node);
-       kfree(double_tap_sysfs_node);
-       return ret;
-}
-
-
 
 static char tp_info_summary[80] = "";
 
@@ -2070,14 +1964,14 @@ static int ist30xx_probe(struct i2c_client *client,
 
 	ret = ist30xx_pinctrl_init(data);
 	if (!ret && data->pinctrl) {
-	/*
-	* Pinctrl handle is optional. If pinctrl handle is found
-	* let pins to be configured in active state. If not
-	* found continue further without error.
-	*/
-	ret = pinctrl_select_state(data->pinctrl, data->pinctrl_state_active);
-	if (ret < 0)
-		tsp_err("failed to select %s pinatate %d\n", "pmx_ts_active", ret);
+		/*
+		* Pinctrl handle is optional. If pinctrl handle is found
+		* let pins to be configured in active state. If not
+		* found continue further without error.
+		*/
+		ret = pinctrl_select_state(data->pinctrl, data->pinctrl_state_active);
+		if (ret < 0)
+			tsp_err("failed to select %s pinatate %d\n", "pmx_ts_active", ret);
 	}
 
 	input_dev = input_allocate_device();
@@ -2255,7 +2149,6 @@ static int ist30xx_probe(struct i2c_client *client,
 		goto err_read_info;
 #endif
 
-
 #ifdef XIAOMI_PRODUCT
 	memset(tp_lockdown_info, 0, sizeof(tp_lockdown_info));
 	sprintf(tp_lockdown_info, "%08X%08X", data->fw.cur.lockdown[0], data->fw.cur.lockdown[1]);
@@ -2293,18 +2186,11 @@ static int ist30xx_probe(struct i2c_client *client,
 	ist30xx_start(data);
 	data->initialized = true;
 #endif
-
-	ret = sysfs_create_group(&client->dev.kobj, &ist30xx_ts_attr_group);
-	if (ret) {
-		dev_err(&client->dev, "Failure %d creating sysfs group\n",ret);
-		goto err_alloc_dt;
-	}
-	ist30xx_proc_init(client->dev.kobj.sd);
-
 	strcpy(tp_info_summary, "[Vendor]Dongshan, [IC]IST3038C, [FW]Ver");
 	sprintf(tp_temp_info, "%x", data->fw.bin.fw_ver);
 	strcat(tp_info_summary, tp_temp_info);
 	strcat(tp_info_summary, "\0");
+	hq_regiser_hw_info(HWID_CTP, tp_info_summary);
 	tsp_info("### IMAGIS probe success ###\n");
 
 	return 0;
@@ -2350,7 +2236,6 @@ err_alloc_dev:
 	tsp_err("Error, ist30xx init driver\n");
 	return -ENODEV;
 }
-
 
 static int ist30xx_remove(struct i2c_client *client)
 {
@@ -2446,7 +2331,6 @@ static int __init ist30xx_init(void)
 	tsp_info("%s()\n", __func__);
 	return i2c_add_driver(&ist30xx_i2c_driver);
 }
-
 
 static void __exit ist30xx_exit(void)
 {

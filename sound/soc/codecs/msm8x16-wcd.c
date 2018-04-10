@@ -4455,7 +4455,6 @@ static const struct snd_soc_dapm_route audio_map[] = {
 	{"LINE_OUT", "Switch", "LINEOUT DAC"},
 	{"LINEOUT DAC", NULL, "RX3 CHAIN"},
 	{ "Ext Spk", NULL, "LINEOUT PA"},
-
 	/* lineout to WSA */
 	{"WSA_SPK OUT", NULL, "LINEOUT PA"},
 

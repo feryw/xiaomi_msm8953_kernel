@@ -1,5 +1,5 @@
 /* Copyright (C) 2013 by Xiang Xiao <xiaoxiang@xiaomi.com>
- * Copyright (C) 2017 XiaoMi, Inc.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -95,7 +95,7 @@ static enum hrtimer_restart pwm_ir_tx_timer(struct hrtimer *timer)
 
 	if (!pkt->abort && pkt->next < pkt->length) {
 		u64 orun = hrtimer_forward_now(&pkt->timer,
-			ns_to_ktime(pkt->buffer[pkt->next++]));
+				ns_to_ktime(pkt->buffer[pkt->next++]));
 		if (orun > 1)
 			pr_warn("pwm-ir: lost %llu hrtimer callback\n", orun - 1);
 
@@ -223,8 +223,8 @@ static int __devinit pwm_ir_tx_probe(struct pwm_ir_dev *dev)
 		dev->reg = regulator_get(&dev->pdev->dev, data->reg_id);
 		if (IS_ERR(dev->reg)) {
 			dev_err(&dev->pdev->dev,
-				"failed to regulator_get(%s)\n",
-				 data->reg_id);
+					"failed to regulator_get(%s)\n",
+					 data->reg_id);
 			return PTR_ERR(dev->reg);
 		}
 	}
@@ -233,7 +233,7 @@ static int __devinit pwm_ir_tx_probe(struct pwm_ir_dev *dev)
 	dev->pwm = of_pwm_get(pdev->dev.of_node, NULL);
 	if (IS_ERR(dev->pwm)) {
 		dev_err(&dev->pdev->dev,
-			"failed to of_pwm_get()\n");
+				"failed to of_pwm_get()\n");
 		rc = PTR_ERR(dev->pwm);
 		dev_err(&dev->pdev->dev, "Cannot get PWM device rc:(%d)\n", rc);
 		dev->pwm = NULL;
@@ -241,7 +241,11 @@ static int __devinit pwm_ir_tx_probe(struct pwm_ir_dev *dev)
 	}
 
 	if (data->low_active) {
+#if 0 /* need the latest kernel */
+		rc = pwm_set_polarity(dev->pwm, PWM_POLARITY_INVERSED);
+#else
 		rc = -ENOSYS;
+#endif
 		if (rc != 0) {
 			dev_err(&dev->pdev->dev, "failed to change polarity\n");
 			goto err_pwm_free;
@@ -291,8 +295,8 @@ static int __devinit pwm_ir_probe(struct platform_device *pdev)
 				data->use_timer = of_property_read_bool(pdev->dev.of_node, "use-timer");
 
 				dev_info(&pdev->dev,
-					 "reg-id = %s, low-active = %d, use-timer = %d\n",
-					  data->reg_id,  data->low_active, data->use_timer);
+						"reg-id = %s, low-active = %d, use-timer = %d\n",
+						data->reg_id,  data->low_active, data->use_timer);
 			}
 		} else {
 			dev_err(&pdev->dev, "failed to alloc platform data\n");

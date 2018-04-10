@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 2010, Imagis Technology Co. Ltd. All Rights Reserved.
- *  Copyright (C) 2017 XiaoMi, Inc.
+ *  Copyright (C) 2018 XiaoMi, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,20 +17,13 @@
 #ifndef __IST30XXC_H__
 #define __IST30XXC_H__
 
-/*
- * Support F/W ver : ~ IST30xxC v3.0.0.0
- * Support CmCs ver : v5.2
- * Support IC : IST3026C, IST3032C, IST3038C, IST3038C1, IST3044C, IST3048C
- * Release : 2015.09.18 by Drake
- */
-
 #define IMAGIS_TSP_DD_VERSION       ("3.0.0.0")
 
-#define IMAGIS_IST3026C             (1) /* 3026C */
-#define IMAGIS_IST3032C             (2) /* 3032C */
-#define IMAGIS_IST3038C             (3) /* 3038C/3038C1 */
-#define IMAGIS_IST3044C             (4) /* 3044C */
-#define IMAGIS_IST3048C             (5) /* 3048C */
+#define IMAGIS_IST3026C             (1)
+#define IMAGIS_IST3032C             (2)
+#define IMAGIS_IST3038C             (3)
+#define IMAGIS_IST3044C             (4)
+#define IMAGIS_IST3048C             (5)
 
 #define IMAGIS_TSP_IC               IMAGIS_IST3038C
 #define TSP_CHIP_VENDOR             ("IMAGIS")
@@ -207,7 +200,7 @@
 /* interrupt macro */
 #define IST30XX_INTR_STATUS         (0x00000C00)
 #define CHECK_INTR_STATUS(n)        (((n & IST30XX_INTR_STATUS) \
-					== IST30XX_INTR_STATUS) ? 1 : 0)
+		== IST30XX_INTR_STATUS) ? 1 : 0)
 #define PARSE_FINGER_CNT(n)         ((n >> 12) & 0xF)
 #define PARSE_KEY_CNT(n)            ((n >> 21) & 0x7)
 /* Finger status: [9:0] */
@@ -472,7 +465,7 @@ struct ist30xx_data {
 	bool tkey_pressed[IST30XX_MAX_KEYS];
 #endif
 #if defined(CONFIG_FB)
-		struct notifier_block fb_notif;
+	struct notifier_block fb_notif;
 #endif
 
 	u32 raw_addr;

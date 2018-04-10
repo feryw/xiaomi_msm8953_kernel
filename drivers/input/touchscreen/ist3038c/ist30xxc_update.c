@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 2010,Imagis Technology Co. Ltd. All Rights Reserved.
- *  Copyright (C) 2017 XiaoMi, Inc.
+ *  Copyright (C) 2018 XiaoMi, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ int ist30xx_isp_read_burst(struct i2c_client *client, u32 addr, u32 *buf32,
 	for (i = 0; i < len; i += max_len) {
 		if (remain_len < max_len)
 			max_len = remain_len;
-		ret = ist30xx_read_buf(client, addr, buf32, max_len);
+			ret = ist30xx_read_buf(client, addr, buf32, max_len);
 		if (unlikely(ret)) {
 			tsp_err("Burst fail, addr: %x\n", __func__, addr);
 			return ret;
@@ -75,7 +75,7 @@ int ist30xx_isp_write_burst(struct i2c_client *client, u32 addr, u32 *buf32,
 	for (i = 0; i < len; i += max_len) {
 		if (remain_len < max_len)
 			max_len = remain_len;
-		ret = ist30xx_write_buf(client, addr, buf32, max_len);
+			ret = ist30xx_write_buf(client, addr, buf32, max_len);
 		if (unlikely(ret)) {
 			tsp_err("Burst fail, addr: %x\n", addr);
 			return ret;
@@ -84,7 +84,6 @@ int ist30xx_isp_write_burst(struct i2c_client *client, u32 addr, u32 *buf32,
 		buf32 += max_len;
 		remain_len -= max_len;
 	}
-
 	return 0;
 }
 
@@ -367,7 +366,7 @@ int ist30xxc_read_chksum(struct ist30xx_data *data, u32 *chksum)
 	start_addr = data->tags.fw_addr;
 	end_addr = data->tags.sensor_addr + data->tags.sensor_size;
 	ret = ist30xxc_cmd_read_chksum(data, IST30XX_ISP_READ_TOTAL_CRC, start_addr,
-		   end_addr, chksum);
+			end_addr, chksum);
 	if (unlikely(ret))
 		return ret;
 
@@ -384,7 +383,7 @@ int ist30xxc_read_chksum_all(struct ist30xx_data *data, u32 *chksum)
 	start_addr = IST30XX_FLASH_BASE_ADDR;
 	end_addr = IST30XX_FLASH_BASE_ADDR + IST30XX_FLASH_TOTAL_SIZE;
 	ret = ist30xxc_cmd_read_chksum(data, IST30XX_ISP_READ_TOTAL_CRC, start_addr,
-		   end_addr, chksum);
+			end_addr, chksum);
 	if (unlikely(ret))
 		return ret;
 
@@ -933,7 +932,7 @@ void ist30xx_print_info(struct ist30xx_data *data)
 	tsp_info("TSP info: \n");
 	tsp_info(" finger num: %d\n", tsp->finger_num);
 	tsp_info(" dir swap: %d, flip x: %d, y: %d\n",
-		 tsp->dir.swap_xy, tsp->dir.flip_x, tsp->dir.flip_y);
+			tsp->dir.swap_xy, tsp->dir.flip_x, tsp->dir.flip_y);
 	tsp_info(" baseline: %d\n", tsp->baseline);
 	tsp_info(" ch_num tx: %d, rx: %d\n", tsp->ch_num.tx, tsp->ch_num.rx);
 	tsp_info(" screen tx: %d, rx: %d\n", tsp->screen.tx, tsp->screen.rx);
@@ -960,8 +959,8 @@ int ist30xx_fw_update(struct ist30xx_data *data, const u8 *buf, int size)
 
 	tsp_info("*** Firmware update ***\n");
 	tsp_info(" main: %x, fw: %x, test: %x, core: %x(addr: 0x%x ~ 0x%x)\n",
-		 fw->bin.main_ver, fw->bin.fw_ver, fw->bin.test_ver, fw->bin.core_ver,
-		 fw->index, (fw->index + fw->size));
+			fw->bin.main_ver, fw->bin.fw_ver, fw->bin.test_ver, fw->bin.core_ver,
+			fw->index, (fw->index + fw->size));
 
 	data->status.update = 1;
 	data->status.update_result = 0;
@@ -1047,7 +1046,7 @@ int ist30xx_check_fw(struct ist30xx_data *data)
 
 	if (unlikely(chksum != data->fw.chksum)) {
 		tsp_warn("Checksum compare error, (IC: %08x, Bin: %08x)\n",
-			 chksum, data->fw.chksum);
+				chksum, data->fw.chksum);
 		return -EPERM;
 	}
 
@@ -1083,24 +1082,6 @@ int ist30xx_check_auto_update(struct ist30xx_data *data)
 
 	if (likely((fw->cur.fw_ver > 0) && (fw->cur.fw_ver <= 0xFFFF))) {
 		if (unlikely(((fw->cur.main_ver & MAIN_VER_MASK) == MAIN_VER_MASK) ||
-				 ((fw->cur.main_ver & MAIN_VER_MASK) == 0)))
-			goto fw_check_end;
-
-		tsp_info("Version compare IC: %x(%x), BIN: %x(%x)\n", fw->cur.fw_ver,
-			 fw->cur.main_ver, fw->bin.fw_ver, fw->bin.main_ver);
-
-		/* If FW version is same, check FW checksum */
-		if (likely((fw->cur.main_ver == fw->bin.main_ver) &&
-			   (fw->cur.fw_ver == fw->bin.fw_ver) &&
-			   (fw->cur.test_ver == 0))) {
-			ret = ist30xx_read_cmd(data, eHCOM_GET_CRC32, &chksum);
-			if (unlikely((ret) || (chksum != fw->chksum))) {
-				tsp_warn("Checksum error, IC: %x, Bin: %x (ret: %d)\n",
-					 chksum, fw->chksum, ret);
-				goto fw_check_end;
-			}
-		}
-
 		/*
 		 *  fw->cur.main_ver : Main version in TSP IC
 		 *  fw->cur.fw_ver : FW version if TSP IC
@@ -1108,9 +1089,24 @@ int ist30xx_check_auto_update(struct ist30xx_data *data)
 		 *  fw->bin.fw_ver : FW version in FW Binary
 		 */
 		/* If the ver of binary is higher than ver of IC, FW update operate. */
+				((fw->cur.main_ver & MAIN_VER_MASK) == 0)))
+			goto fw_check_end;
 
+		tsp_info("Version compare IC: %x(%x), BIN: %x(%x)\n", fw->cur.fw_ver,
+			fw->cur.main_ver, fw->bin.fw_ver, fw->bin.main_ver);
+
+		if (likely((fw->cur.main_ver == fw->bin.main_ver) &&
+				(fw->cur.fw_ver == fw->bin.fw_ver) &&
+				(fw->cur.test_ver == 0))) {
+			ret = ist30xx_read_cmd(data, eHCOM_GET_CRC32, &chksum);
+			if (unlikely((ret) || (chksum != fw->chksum))) {
+				tsp_warn("Checksum error, IC: %x, Bin: %x (ret: %d)\n",
+						 chksum, fw->chksum, ret);
+				goto fw_check_end;
+			}
+		}
 		if (likely((fw->cur.main_ver >= fw->bin.main_ver) &&
-			   (fw->cur.fw_ver >= fw->bin.fw_ver)))
+				(fw->cur.fw_ver >= fw->bin.fw_ver)))
 			return 0;
 	}
 
@@ -1148,8 +1144,8 @@ int ist30xx_auto_bin_update(struct ist30xx_data *data)
 	fw->bin.core_ver = ist30xx_parse_ver(data, FLAG_CORE, fw->buf);
 
 	tsp_info("IC: %x, Binary ver main: %x, fw: %x, test: %x, core: %x\n",
-		 data->chip_id, fw->bin.main_ver, fw->bin.fw_ver, fw->bin.test_ver,
-		 fw->bin.core_ver);
+			data->chip_id, fw->bin.main_ver, fw->bin.fw_ver, fw->bin.test_ver,
+			fw->bin.core_ver);
 
 	mutex_lock(&data->lock);
 	ret = ist30xx_check_auto_update(data);
@@ -1360,7 +1356,7 @@ ssize_t ist30xx_fw_sdcard_show(struct device *dev,
 	set_fs(get_ds());
 
 	snprintf(fw_path, MAX_FILE_PATH, "/sdcard/%s",
-		 IST30XX_FW_NAME);
+			IST30XX_FW_NAME);
 	fp = filp_open(fw_path, O_RDONLY, 0);
 	if (IS_ERR(fp)) {
 		data->status.update_result = 1;
@@ -1478,11 +1474,11 @@ ssize_t ist30xx_fw_read_show(struct device *dev, struct device_attribute *attr,
 
 	for (i = 0; i < IST30XX_FLASH_TOTAL_SIZE; i += 16) {
 		tsp_debug("%07x: %02x %02x %02x %02x %02x %02x %02x %02x "
-			  "%02x %02x %02x %02x %02x %02x %02x %02x\n", i,
-			  buf8[i], buf8[i + 1], buf8[i + 2], buf8[i + 3],
-			  buf8[i + 4], buf8[i + 5], buf8[i + 6], buf8[i + 7],
-			  buf8[i + 8], buf8[i + 9], buf8[i + 10], buf8[i + 11],
-			  buf8[i + 12], buf8[i + 13], buf8[i + 14], buf8[i + 15]);
+				"%02x %02x %02x %02x %02x %02x %02x %02x\n", i,
+				buf8[i], buf8[i + 1], buf8[i + 2], buf8[i + 3],
+				buf8[i + 4], buf8[i + 5], buf8[i + 6], buf8[i + 7],
+				buf8[i + 8], buf8[i + 9], buf8[i + 10], buf8[i + 11],
+				buf8[i + 12], buf8[i + 13], buf8[i + 14], buf8[i + 15]);
 	}
 
 	old_fs = get_fs();

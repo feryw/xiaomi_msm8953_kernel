@@ -20,8 +20,8 @@ struct gf_key {
 
 
 struct gf_key_map {
-    char *name;
-    unsigned short val;
+	char *name;
+	unsigned short val;
 };
 
 #define  GF_IOC_MAGIC         'G'

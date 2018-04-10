@@ -7,7 +7,7 @@
 #include <net/netlink.h>
 
 #define NETLINK_TEST 25
-#define MAX_MSGSIZE 4 * 1024
+#define MAX_MSGSIZE 4*1024
 int stringlength(char *s);
 void sendnlmsg(char *message);
 int pid;
@@ -15,7 +15,7 @@ int err;
 struct sock *nl_sk = NULL;
 int flag = 0;
 
-struct gf_uk_channel {
+struct gf_uk_channel{
 	int channel_id;
 	int reserved;
 	char buf[3*1024];
@@ -66,14 +66,11 @@ int netlink_init(void)
 	netlink_cfg.flags = 0;
 	netlink_cfg.input = nl_data_ready;
 	netlink_cfg.cb_mutex = NULL;
-
 	nl_sk = netlink_kernel_create(&init_net, NETLINK_TEST, &netlink_cfg);
-
 	if (!nl_sk) {
-	printk(KERN_ERR "my_net_link: create netlink socket error.\n");
-	return 1;
+		printk(KERN_ERR "my_net_link: create netlink socket error.\n");
+		return 1;
 	}
-
 	return 0;
 }
 
@@ -82,6 +79,5 @@ void netlink_exit(void)
 	if (nl_sk != NULL) {
 		sock_release(nl_sk->sk_socket);
 	}
-
 	printk("my_net_link: self module exited\n");
 }

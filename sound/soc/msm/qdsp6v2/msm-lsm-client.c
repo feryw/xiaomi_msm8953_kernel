@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2013-2017, Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -734,7 +735,7 @@ static int msm_lsm_ioctl_shared(struct snd_pcm_substream *substream,
 		if (copy_from_user(&session_data, arg,
 				   sizeof(session_data))) {
 			dev_err(rtd->dev, "%s: %s: copy_from_user failed\n",
-				__func__, "LSM_SET_SESSION_DATA");
+					__func__, "LSM_SET_SESSION_DATA");
 			return -EFAULT;
 		}
 
@@ -989,37 +990,37 @@ static int msm_lsm_ioctl_shared(struct snd_pcm_substream *substream,
 
 		if (copy_from_user(&enable, arg, sizeof(enable))) {
 			dev_err(rtd->dev, "%s: %s: copy_frm_user failed\n",
-				__func__, "LSM_LAB_CONTROL");
+					__func__, "LSM_LAB_CONTROL");
 			return -EFAULT;
 		}
 
 		dev_dbg(rtd->dev, "%s: ioctl %s, enable = %d\n",
-			 __func__, "SNDRV_LSM_LAB_CONTROL", enable);
+				 __func__, "SNDRV_LSM_LAB_CONTROL", enable);
 		if (!prtd->lsm_client->started) {
 			if (prtd->lsm_client->lab_enable == enable) {
 				dev_dbg(rtd->dev,
-					"%s: Lab for session %d already %s\n",
-					__func__, prtd->lsm_client->session,
-					enable ? "enabled" : "disabled");
+						"%s: Lab for session %d already %s\n",
+						__func__, prtd->lsm_client->session,
+						enable ? "enabled" : "disabled");
 				rc = 0;
 				break;
 			}
 			rc = q6lsm_lab_control(prtd->lsm_client, enable);
 			if (rc) {
 				dev_err(rtd->dev,
-					"%s: ioctl %s failed rc %d to %s lab for session %d\n",
-					__func__, "SNDRV_LAB_CONTROL", rc,
-					enable ? "enable" : "disable",
-					prtd->lsm_client->session);
+						"%s: ioctl %s failed rc %d to %s lab for session %d\n",
+						__func__, "SNDRV_LAB_CONTROL", rc,
+						enable ? "enable" : "disable",
+						prtd->lsm_client->session);
 			} else {
 				rc = msm_lsm_lab_buffer_alloc(prtd,
-					enable ? LAB_BUFFER_ALLOC
-					: LAB_BUFFER_DEALLOC);
+						enable ? LAB_BUFFER_ALLOC
+						: LAB_BUFFER_DEALLOC);
 				if (rc)
 					dev_err(rtd->dev,
-						"%s: msm_lsm_lab_buffer_alloc failed rc %d for %s",
-						__func__, rc,
-						enable ? "ALLOC" : "DEALLOC");
+							"%s: msm_lsm_lab_buffer_alloc failed rc %d for %s",
+							__func__, rc,
+							enable ? "ALLOC" : "DEALLOC");
 				if (!rc)
 					prtd->lsm_client->lab_enable = enable;
 			}
@@ -1062,7 +1063,6 @@ static int msm_lsm_ioctl_shared(struct snd_pcm_substream *substream,
 	return rc;
 }
 #ifdef CONFIG_COMPAT
-
 struct snd_lsm_sound_model_v2_32 {
 	compat_uptr_t data;
 	compat_uptr_t confidence_level;

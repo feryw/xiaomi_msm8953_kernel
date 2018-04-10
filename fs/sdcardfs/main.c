@@ -52,8 +52,8 @@ static const match_table_t sdcardfs_tokens = {
 };
 
 static int parse_options(struct super_block *sb, char *options, int silent,
-				int *debug, struct sdcardfs_vfsmount_options *vfsopts,
-				struct sdcardfs_mount_options *opts)
+		int *debug, struct sdcardfs_vfsmount_options *vfsopts,
+		struct sdcardfs_mount_options *opts)
 {
 	char *p;
 	substring_t args[MAX_OPT_ARGS];
@@ -148,7 +148,7 @@ static int parse_options(struct super_block *sb, char *options, int silent,
 }
 
 int parse_options_remount(struct super_block *sb, char *options, int silent,
-				struct sdcardfs_vfsmount_options *vfsopts)
+		struct sdcardfs_vfsmount_options *vfsopts)
 {
 	char *p;
 	substring_t args[MAX_OPT_ARGS];
@@ -181,7 +181,6 @@ int parse_options_remount(struct super_block *sb, char *options, int silent,
 				return 0;
 			vfsopts->mask = option;
 			break;
-		case Opt_default_normal:
 		case Opt_multiuser:
 		case Opt_userid:
 		case Opt_fsuid:
@@ -189,7 +188,6 @@ int parse_options_remount(struct super_block *sb, char *options, int silent,
 		case Opt_reserved_mb:
 			pr_warn("Option \"%s\" can't be changed during remount\n", p);
 			break;
-		/* unknown option */
 		default:
 			if (!silent)
 				pr_err("Unrecognized mount option \"%s\" or missing value", p);
@@ -378,11 +376,12 @@ out:
 	return err;
 }
 
-struct sdcardfs_mount_private {
-	struct vfsmount *mnt;
-	const char *dev_name;
-	void *raw_data;
-};
+/* A feature which supports mount_nodev() with options */
+static struct dentry *mount_nodev_with_options(struct vfsmount *mnt,
+		struct file_system_type *fs_type, int flags,
+		const char *dev_name, void *data,
+		int (*fill_super)(struct vfsmount *, struct super_block *,
+				const char *, void *, int))
 
 static int __sdcardfs_fill_super(
 	struct super_block *sb,
@@ -408,8 +407,29 @@ static struct dentry *sdcardfs_mount(struct vfsmount *mnt,
 		&priv, __sdcardfs_fill_super);
 }
 
+	error = fill_super(mnt, s, dev_name, data, flags & MS_SILENT ? 1 : 0);
+	if (error) {
+		deactivate_locked_super(s);
+		return ERR_PTR(error);
+	}
+	s->s_flags |= MS_ACTIVE;
+	return dget(s->s_root);
+}
+
+static struct dentry *sdcardfs_mount(struct vfsmount *mnt,
+		struct file_system_type *fs_type, int flags,
+			    const char *dev_name, void *raw_data)
+{
+	/*
+	 * dev_name is a lower_path_name,
+	 * raw_data is a option string.
+	 */
+	return mount_nodev_with_options(mnt, fs_type, flags, dev_name,
+			raw_data, sdcardfs_read_super);
+}
+
 static struct dentry *sdcardfs_mount_wrn(struct file_system_type *fs_type,
-		    int flags, const char *dev_name, void *raw_data)
+		int flags, const char *dev_name, void *raw_data)
 {
 	WARN(1, "sdcardfs does not support mount. Use mount2.\n");
 	return ERR_PTR(-EINVAL);

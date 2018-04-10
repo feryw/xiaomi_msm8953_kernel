@@ -38,7 +38,7 @@ static struct kmem_cache *sdcardfs_inode_data_cachep;
 void data_release(struct kref *ref)
 {
 	struct sdcardfs_inode_data *data =
-		container_of(ref, struct sdcardfs_inode_data, refcount);
+			container_of(ref, struct sdcardfs_inode_data, refcount);
 
 	kmem_cache_free(sdcardfs_inode_data_cachep, data);
 }
@@ -131,7 +131,7 @@ static int sdcardfs_remount_fs(struct super_block *sb, int *flags, char *options
  * @options: mount options string
  */
 static int sdcardfs_remount_fs2(struct vfsmount *mnt, struct super_block *sb,
-						int *flags, char *options)
+		int *flags, char *options)
 {
 	int err = 0;
 
@@ -207,7 +207,7 @@ static struct inode *sdcardfs_alloc_inode(struct super_block *sb)
 	memset(i, 0, offsetof(struct sdcardfs_inode_info, vfs_inode));
 
 	d = kmem_cache_alloc(sdcardfs_inode_data_cachep,
-					GFP_KERNEL | __GFP_ZERO);
+			GFP_KERNEL | __GFP_ZERO);
 	if (!d) {
 		kmem_cache_free(sdcardfs_inode_cachep, i);
 		return NULL;
@@ -284,7 +284,7 @@ static void sdcardfs_umount_begin(struct super_block *sb)
 }
 
 static int sdcardfs_show_options(struct vfsmount *mnt, struct seq_file *m,
-			struct dentry *root)
+		struct dentry *root)
 {
 	struct sdcardfs_sb_info *sbi = SDCARDFS_SB(root->d_sb);
 	struct sdcardfs_mount_options *opts = &sbi->options;
@@ -302,10 +302,6 @@ static int sdcardfs_show_options(struct vfsmount *mnt, struct seq_file *m,
 		seq_printf(m, ",mask=%u", vfsopts->mask);
 	if (opts->fs_user_id)
 		seq_printf(m, ",userid=%u", opts->fs_user_id);
-	if (opts->gid_derivation)
-		seq_puts(m, ",derive_gid");
-	if (opts->default_normal)
-		seq_puts(m, ",default_normal");
 	if (opts->reserved_mb != 0)
 		seq_printf(m, ",reserved=%uMB", opts->reserved_mb);
 

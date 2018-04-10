@@ -1,7 +1,7 @@
 /* ir-lirc-codec.c - rc-core to classic lirc interface bridge
  *
  * Copyright (C) 2010 by Jarod Wilson <jarod@redhat.com>
- * Copyright (C) 2017 XiaoMi, Inc.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include <media/lirc_dev.h>
 #include <media/rc-core.h>
 #include "rc-core-priv.h"
+
 
 #define LIRCBUF_SIZE 1024
 
@@ -122,7 +123,6 @@ static ssize_t ir_lirc_transmit_ir(struct file *file, const char __user *buf,
 
 	start = ktime_get();
 #endif
-
 	lirc = lirc_get_pdata(file);
 	if (!lirc)
 		return -EFAULT;
@@ -148,7 +148,6 @@ static ssize_t ir_lirc_transmit_ir(struct file *file, const char __user *buf,
 		ret = -ENOSYS;
 		goto out;
 	}
-
 #ifndef CONFIG_IR_PWM
 	for (i = 0; i < count; i++) {
 		if (txbuf[i] > IR_MAX_DURATION / 1000 - duration || !txbuf[i]) {
@@ -159,18 +158,14 @@ static ssize_t ir_lirc_transmit_ir(struct file *file, const char __user *buf,
 		duration += txbuf[i];
 	}
 #endif
-
 	ret = dev->tx_ir(dev, txbuf, count);
 	if (ret < 0)
 		goto out;
-
 #ifndef CONFIG_IR_PWM
 	for (duration = i = 0; i < ret; i++)
 		duration += txbuf[i];
 #endif
-
 	ret *= sizeof(unsigned int);
-
 #ifndef CONFIG_IR_PWM
 	/*
 	 * The lircd gap calculation expects the write function to
@@ -183,7 +178,6 @@ static ssize_t ir_lirc_transmit_ir(struct file *file, const char __user *buf,
 		schedule_timeout(usecs_to_jiffies(towait));
 	}
 #endif
-
 out:
 	kfree(txbuf);
 	return ret;

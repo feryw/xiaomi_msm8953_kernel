@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 2010,Imagis Technology Co. Ltd. All Rights Reserved.
- * Copyright (C) 2017 XiaoMi, Inc.
+ *  Copyright (C) 2018 XiaoMi, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@ void ist30xx_tracking_init(void)
 		return;
 
 	pTrackBuf = &TrackBuf;
-
 	pTrackBuf->RingBufCtr = 0;
 	pTrackBuf->RingBufInIdx = 0;
 	pTrackBuf->RingBufOutIdx = 0;
@@ -96,7 +95,7 @@ int ist30xx_put_track(u32 *track, int cnt)
 	pTrackBuf->RingBufCtr += cnt;
 	if (pTrackBuf->RingBufCtr > IST30XX_MAX_RINGBUF_SIZE) {
 		pTrackBuf->RingBufOutIdx +=
-			(pTrackBuf->RingBufCtr - IST30XX_MAX_RINGBUF_SIZE);
+				(pTrackBuf->RingBufCtr - IST30XX_MAX_RINGBUF_SIZE);
 		if (pTrackBuf->RingBufOutIdx >= IST30XX_MAX_RINGBUF_SIZE)
 			pTrackBuf->RingBufOutIdx -= IST30XX_MAX_RINGBUF_SIZE;
 
@@ -208,7 +207,7 @@ int ist30xx_init_tracking_sysfs(struct ist30xx_data *data)
 {
 	/* /sys/class/touch/tracking */
 	ist30xx_tracking_dev = device_create(ist30xx_class, NULL, 0, data,
-					     "tracking");
+		     "tracking");
 
 	dev_set_drvdata(ist30xx_tracking_dev, data);
 	/* /sys/class/touch/tracking/... */

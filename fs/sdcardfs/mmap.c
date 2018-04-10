@@ -49,7 +49,7 @@ static void sdcardfs_vm_close(struct vm_area_struct *vma)
 }
 
 static int sdcardfs_page_mkwrite(struct vm_area_struct *vma,
-			       struct vm_fault *vmf)
+		struct vm_fault *vmf)
 {
 	int err = 0;
 	struct file *file;
@@ -69,11 +69,6 @@ out:
 static ssize_t sdcardfs_direct_IO(int rw, struct kiocb *iocb,
 		struct iov_iter *iter, loff_t pos)
 {
-	/*
-	 * This function should never be called directly.  We need it
-	 * to exist, to get past a check in open_check_o_direct(),
-	 * which is called from do_last().
-	 */
 	return -EINVAL;
 }
 

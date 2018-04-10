@@ -167,14 +167,15 @@ struct inode *sdcardfs_iget(struct super_block *sb, struct inode *lower_inode, u
  * spliced dentries.
  */
 static struct dentry *__sdcardfs_interpose(struct dentry *dentry,
-					 struct super_block *sb,
-					 struct path *lower_path,
-					 userid_t id)
+		struct super_block *sb,
+		struct path *lower_path,
+		userid_t id)
 {
 	struct inode *inode;
 	struct inode *lower_inode;
 	struct super_block *lower_sb;
-	struct dentry *ret_dentry;
+	struct dentry *ret_dentry = NULL;
+	struct dentry *alias = NULL;
 
 	lower_inode = lower_path->dentry->d_inode;
 	lower_sb = sdcardfs_lower_super(sb);
@@ -197,8 +198,21 @@ static struct dentry *__sdcardfs_interpose(struct dentry *dentry,
 		goto out;
 	}
 
-	ret_dentry = d_splice_alias(inode, dentry);
-	dentry = ret_dentry ?: dentry;
+	alias = d_find_any_alias(inode);
+	if (IS_ERR(alias)) {
+		ret_dentry = alias;
+		goto out;
+	}
+
+	/* Allow to 'obb' inode have multiple dentry */
+	if (need_graft_path(dentry) ||
+			(alias && alias->d_parent != dentry->d_parent)) {
+		d_add(dentry, inode);
+	} else {
+		ret_dentry = d_splice_alias(inode, dentry);
+		dentry = ret_dentry ?: dentry;
+	}
+
 	if (!IS_ERR(dentry))
 		update_derived_permission_lock(dentry);
 out:
@@ -316,6 +330,42 @@ put_name:
 		__putname(buffer.name);
 	}
 
+	if (err == -ENOENT) {
+		struct file *file;
+		const struct cred *cred = current_cred();
+
+		struct sdcardfs_name_data buffer = {
+			.ctx.actor = sdcardfs_name_match,
+			.to_find = name,
+			.name = __getname(),
+			.found = false,
+		};
+
+		if (!buffer.name) {
+			err = -ENOMEM;
+			goto out;
+		}
+		file = dentry_open(lower_parent_path, O_RDONLY, cred);
+		if (IS_ERR(file)) {
+			err = PTR_ERR(file);
+			goto put_name;
+		}
+		err = iterate_dir(file, &buffer.ctx);
+		fput(file);
+		if (err)
+			goto put_name;
+
+		if (buffer.found)
+			err = vfs_path_lookup(lower_dir_dentry,
+				lower_dir_mnt,
+				buffer.name, 0,
+				&lower_path);
+		else
+			err = -ENOENT;
+put_name:
+		__putname(buffer.name);
+	}
+
 	/* no error: handle positive dentries */
 	if (!err) {
 		/* check if the dentry is an obb dentry
@@ -348,10 +398,9 @@ put_name:
 
 		sdcardfs_set_lower_path(dentry, &lower_path);
 		ret_dentry =
-			__sdcardfs_interpose(dentry, dentry->d_sb, &lower_path, id);
+				__sdcardfs_interpose(dentry, dentry->d_sb, &lower_path, id);
 		if (IS_ERR(ret_dentry)) {
 			err = PTR_ERR(ret_dentry);
-			 /* path_put underlying path on error */
 			sdcardfs_put_reset_lower_path(dentry);
 		}
 		goto out;
@@ -440,7 +489,7 @@ struct dentry *sdcardfs_lookup(struct inode *dir, struct dentry *dentry,
 	}
 
 	ret = __sdcardfs_lookup(dentry, flags, &lower_parent_path,
-				SDCARDFS_I(dir)->data->userid);
+			SDCARDFS_I(dir)->data->userid);
 	if (IS_ERR(ret))
 		goto out;
 	if (ret)

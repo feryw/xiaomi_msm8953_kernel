@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 2010, Imagis Technology Co. Ltd. All Rights Reserved.
- * Copyright (C) 2017 XiaoMi, Inc.
+ *  Copyright (C) 2018 XiaoMi, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -74,10 +74,10 @@ int ist30xxc_read_chksum_all(struct ist30xx_data *data, u32 *chksum);
 
 int ist30xxc_isp_enable(struct ist30xx_data *data, bool enable);
 int ist30xxc_isp_info_read(struct ist30xx_data *data, u32 addr, u32 *buf32,
-	u32 len);
+		 u32 len);
 
 int ist30xx_get_update_info(struct ist30xx_data *data, const u8 *buf,
-	const u32 size);
+		 const u32 size);
 int ist30xx_get_tsp_info(struct ist30xx_data *data);
 void ist30xx_print_info(struct ist30xx_data *data);
 u32 ist30xx_parse_ver(struct ist30xx_data *data, int flag, const u8 *buf);
