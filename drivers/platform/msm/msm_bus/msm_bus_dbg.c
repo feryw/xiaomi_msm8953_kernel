@@ -1,4 +1,5 @@
 /* Copyright (c) 2010-2012, 2014-2015, 2017 The Linux Foundation. All rights
+ * Copyright (C) 2018 XiaoMi, Inc.
  * reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -585,7 +586,7 @@ static ssize_t  msm_bus_dbg_update_request_write(struct file *file,
 					MSM_BUS_DBG("Index conversion"
 						" failed\n");
 					rt_mutex_unlock(
-						&msm_bus_dbg_cllist_lock);
+							&msm_bus_dbg_cllist_lock);
 					res = -EFAULT;
 					goto out;
 				}

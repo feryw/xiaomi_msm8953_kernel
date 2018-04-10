@@ -187,13 +187,13 @@ lr	.req	x30		// link register
 	 * @tmp: optional scratch register to be used if <dst> == sp, which
 	 *       is not allowed in an adrp instruction
 	 */
-	.macro	adr_l, dst, sym, tmp=
+	.macro	adr_l, dst, sym, tmp =
 	.ifb	\tmp
 	adrp	\dst, \sym
-	add	\dst, \dst, :lo12:\sym
+	add	\dst, \dst, : lo12 : \sym
 	.else
 	adrp	\tmp, \sym
-	add	\dst, \tmp, :lo12:\sym
+	add	\dst, \tmp, : lo12 : \sym
 	.endif
 	.endm
 
@@ -204,13 +204,13 @@ lr	.req	x30		// link register
 	 *       32-bit wide register, in which case it cannot be used to hold
 	 *       the address
 	 */
-	.macro	ldr_l, dst, sym, tmp=
+	.macro	ldr_l, dst, sym, tmp =
 	.ifb	\tmp
 	adrp	\dst, \sym
-	ldr	\dst, [\dst, :lo12:\sym]
+	ldr	\dst, [\dst, : lo12 : \sym]
 	.else
 	adrp	\tmp, \sym
-	ldr	\dst, [\tmp, :lo12:\sym]
+	ldr	\dst, [\tmp, : lo12 : \sym]
 	.endif
 	.endm
 
@@ -222,7 +222,7 @@ lr	.req	x30		// link register
 	 */
 	.macro	str_l, src, sym, tmp
 	adrp	\tmp, \sym
-	str	\src, [\tmp, :lo12:\sym]
+	str	\src, [\tmp, : lo12 : \sym]
 	.endm
 
 /*
@@ -309,9 +309,9 @@ lr	.req	x30		// link register
  */
 #define ENDPIPROC(x)			\
 	.globl	__pi_##x;		\
-	.type 	__pi_##x, %function;	\
+	.type 	__pi_##x, % function;	\
 	.set	__pi_##x, x;		\
-	.size	__pi_##x, . - x;	\
+	.size	__pi_##x, . -x;	\
 	ENDPROC(x)
 
 /*

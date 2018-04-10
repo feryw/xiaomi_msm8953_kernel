@@ -1,6 +1,7 @@
 /* Qualcomm Crypto Engine driver.
  *
  * Copyright (c) 2012-2016, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -1543,8 +1544,8 @@ static int _ce_setup_aead_direct(struct qce_device *pce_dev,
 							CRYPTO_CONFIG_REG));
 	/* issue go to crypto   */
 	QCE_WRITE_REG(((1 << CRYPTO_GO) | (1 << CRYPTO_RESULTS_DUMP) |
-				(1 << CRYPTO_CLR_CNTXT)),
-				pce_dev->iobase + CRYPTO_GOPROC_REG);
+			(1 << CRYPTO_CLR_CNTXT)),
+			pce_dev->iobase + CRYPTO_GOPROC_REG);
 	/*
 	 * Ensure previous instructions (setting the GO register)
 	 * was completed before issuing a DMA transfer request
@@ -1952,8 +1953,8 @@ static int _ce_f9_setup_direct(struct qce_device *pce_dev,
 							CRYPTO_CONFIG_REG));
 	/* write go */
 	QCE_WRITE_REG(((1 << CRYPTO_GO) | (1 << CRYPTO_RESULTS_DUMP) |
-				(1 << CRYPTO_CLR_CNTXT)),
-				pce_dev->iobase +  CRYPTO_GOPROC_REG);
+			(1 << CRYPTO_CLR_CNTXT)),
+			pce_dev->iobase +  CRYPTO_GOPROC_REG);
 	/*
 	 * Ensure previous instructions (setting the GO register)
 	 * was completed before issuing a DMA transfer request
@@ -2030,8 +2031,8 @@ static int _ce_f8_setup_direct(struct qce_device *pce_dev,
 							CRYPTO_CONFIG_REG));
 	/* write go */
 	QCE_WRITE_REG(((1 << CRYPTO_GO) | (1 << CRYPTO_RESULTS_DUMP) |
-				(1 << CRYPTO_CLR_CNTXT)),
-				pce_dev->iobase +  CRYPTO_GOPROC_REG);
+			(1 << CRYPTO_CLR_CNTXT)),
+			pce_dev->iobase +  CRYPTO_GOPROC_REG);
 	/*
 	 * Ensure previous instructions (setting the GO register)
 	 * was completed before issuing a DMA transfer request

@@ -52,6 +52,7 @@ config WIL6210_WRITE_IOCTL
 
 	  If unsure, say N.
 
+
 config WIL6210_PLATFORM_MSM
 	bool "wil6210 MSM platform specific support"
 	depends on WIL6210

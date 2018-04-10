@@ -2,6 +2,7 @@
  * Debugfs support for hosts and cards
  *
  * Copyright (C) 2008 Atmel Corporation
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -396,7 +397,7 @@ void mmc_add_host_debugfs(struct mmc_host *host)
 
 #ifdef CONFIG_MMC_RING_BUFFER
 	if (!debugfs_create_file("ring_buffer", S_IRUSR,
-				root, host, &mmc_ring_buffer_fops))
+			root, host, &mmc_ring_buffer_fops))
 		goto err_node;
 #endif
 

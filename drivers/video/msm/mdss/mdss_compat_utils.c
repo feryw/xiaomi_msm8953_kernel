@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2013-2017, The Linux Foundation. All rights reserved.
  * Copyright (C) 1994 Martin Schaller
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * 2001 - Documented with DocBook
  * - Brad Douglas <brad@neruo.com>
@@ -119,15 +120,16 @@ static unsigned int __do_compat_ioctl_nr(unsigned int cmd32)
 static void  __copy_atomic_commit_struct(struct mdp_layer_commit  *commit,
 	struct mdp_layer_commit32 *commit32)
 {
-	unsigned int destsize = sizeof(commit->commit_v1.reserved);
-	unsigned int srcsize = sizeof(commit32->commit_v1.reserved);
-	unsigned int count = (destsize <= srcsize ? destsize : srcsize);
+	unsigned int destSize = sizeof(commit->commit_v1.reserved);
+	unsigned int srcSize = sizeof(commit32->commit_v1.reserved);
+	unsigned int count = (destSize <= srcSize ? destSize : srcSize);
 	commit->version = commit32->version;
 	commit->commit_v1.flags = commit32->commit_v1.flags;
 	commit->commit_v1.input_layer_cnt =
 		commit32->commit_v1.input_layer_cnt;
 	commit->commit_v1.left_roi = commit32->commit_v1.left_roi;
 	commit->commit_v1.right_roi = commit32->commit_v1.right_roi;
+
 	memcpy(&commit->commit_v1.reserved, &commit32->commit_v1.reserved,
 		count);
 }

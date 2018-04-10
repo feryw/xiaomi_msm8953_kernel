@@ -1,4 +1,5 @@
 /* Copyright (c) 2009-2017, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -275,10 +276,10 @@ static int32_t msm_flash_i2c_init(
 		flash_ctrl->power_setting_array.size_down;
 
 	if ((flash_ctrl->power_info.power_setting_size > MAX_POWER_CONFIG) ||
-	(flash_ctrl->power_info.power_down_setting_size > MAX_POWER_CONFIG)) {
+			(flash_ctrl->power_info.power_down_setting_size > MAX_POWER_CONFIG)) {
 		pr_err("%s:%d invalid power setting size=%d size_down=%d\n",
-			__func__, __LINE__,
-			flash_ctrl->power_info.power_setting_size,
+				__func__, __LINE__,
+				flash_ctrl->power_info.power_setting_size,
 			flash_ctrl->power_info.power_down_setting_size);
 		rc = -EINVAL;
 		goto msm_flash_i2c_init_fail;

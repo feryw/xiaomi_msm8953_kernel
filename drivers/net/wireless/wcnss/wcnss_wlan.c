@@ -1,4 +1,5 @@
 /* Copyright (c) 2011-2017, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -3349,11 +3350,11 @@ static ssize_t wcnss_wlan_write(struct file *fp, const char __user
 	if (!penv->user_cal_rcvd && count >= 4 && !penv->user_cal_exp_size) {
 		mutex_lock(&penv->dev_lock);
 		rc = copy_from_user((void *)&penv->user_cal_exp_size,
-				    user_buffer, 4);
+				user_buffer, 4);
 		if (!penv->user_cal_exp_size ||
-		    penv->user_cal_exp_size > MAX_CALIBRATED_DATA_SIZE) {
+				penv->user_cal_exp_size > MAX_CALIBRATED_DATA_SIZE) {
 			pr_err(DEVICE " invalid size to write %d\n",
-			       penv->user_cal_exp_size);
+					penv->user_cal_exp_size);
 			penv->user_cal_exp_size = 0;
 			mutex_unlock(&penv->dev_lock);
 			return -EFAULT;
