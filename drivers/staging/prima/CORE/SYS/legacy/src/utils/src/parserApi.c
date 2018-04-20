@@ -2084,7 +2084,7 @@ tSirRetStatus ValidateAndRectifyIEs(tpAniSirGlobal pMac,
                                     tANI_U32 *nMissingRsnBytes)
 {
     tANI_U32 length = SIZE_OF_FIXED_PARAM;
-    tANI_U8 *refFrame;
+    tANI_U8 *refFrame = NULL;
 
     // Frame contains atleast one IE
     if (nFrameBytes > (SIZE_OF_FIXED_PARAM + 2))
@@ -2096,6 +2096,7 @@ tSirRetStatus ValidateAndRectifyIEs(tpAniSirGlobal pMac,
             length += (tANI_U32)(SIZE_OF_TAG_PARAM_NUM + SIZE_OF_TAG_PARAM_LEN
                                  + (*(refFrame + SIZE_OF_TAG_PARAM_NUM)));
         }
+
         if (length != nFrameBytes)
         {
             /* Workaround : Some APs may not include RSN Capability but
@@ -2714,7 +2715,7 @@ sirConvertAssocRespFrame2Struct(tpAniSirGlobal pMac,
 #endif
 
 #ifdef WLAN_FEATURE_VOWIFI_11R
-    if (ar.num_RICDataDesc) {
+    if (ar.num_RICDataDesc <= 2) {
         for (cnt=0; cnt < ar.num_RICDataDesc; cnt++) {
             if (ar.RICDataDesc[cnt].present) {
                 vos_mem_copy( &pAssocRsp->RICData[cnt], &ar.RICDataDesc[cnt],

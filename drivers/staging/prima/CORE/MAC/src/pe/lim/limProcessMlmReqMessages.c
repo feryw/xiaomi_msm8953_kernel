@@ -734,6 +734,14 @@ void limSetDFSChannelList(tpAniSirGlobal pMac,tANI_U8 channelNum, tSirDFSChannel
              limLog(pMac, LOG1, FL("Received first beacon on DFS channel: %d"), channelNum);
              limCovertChannelScanType(pMac,channelNum, passiveToActive);
           }
+
+          if (!pMac->fActiveScanOnDFSChannels &&
+             dfsChannelList->timeStamp[channelNum] &&
+             !limActiveScanAllowed(pMac, channelNum))
+               limLog(pMac, LOGE,
+                 FL("Received beacon on DFS channel %d with dfs time stamp %lu, but channel is still DFS"),
+                 channelNum, dfsChannelList->timeStamp[channelNum]);
+
           dfsChannelList->timeStamp[channelNum] = vos_timer_get_system_time();
        }
        else
@@ -3841,7 +3849,7 @@ tLimMlmRemoveKeyCnf  mlmRemoveKeyCnf;
     * peer entity for which keys need to be removed.
     */
   pStaDs = dphLookupHashEntry( pMac, pMlmRemoveKeyReq->peerMacAddr, &aid, &psessionEntry->dph.dphHashTable );
-  if ((pStaDs == NULL) ||
+    if ((pStaDs == NULL) ||
          (pStaDs &&
          (pStaDs->mlmStaContext.mlmState !=
                        eLIM_MLM_LINK_ESTABLISHED_STATE)))
@@ -3860,9 +3868,9 @@ tLimMlmRemoveKeyCnf  mlmRemoveKeyCnf;
       mlmRemoveKeyCnf.sessionId = pMlmRemoveKeyReq->sessionId;
       
 
-      goto end;
+    goto end;
   }
-  else
+    else
     staIdx = pStaDs->staIndex;
   
 
@@ -3915,7 +3923,7 @@ limProcessMinChannelTimeout(tpAniSirGlobal pMac)
     if((psessionEntry = peFindSessionBySessionId(pMac, pMac->lim.limTimers.gLimMinChannelTimer.sessionId))== NULL) 
     {
         limLog(pMac, LOGP,FL("Session Does not exist for given sessionID"));
-        return;
+    return;
     }
 #endif
 
