@@ -274,7 +274,7 @@ limSuspendLink(tpAniSirGlobal pMac, tSirLinkTrafficCheck trafficCheck,  SUSPEND_
    if( pMac->lim.gpLimSuspendCallback ||
        pMac->lim.gLimSystemInScanLearnMode )
    {
-      limLog( pMac, LOGE, FL("Something is wrong, SuspendLinkCbk:%p "
+      limLog( pMac, LOGE, FL("Something is wrong, SuspendLinkCbk:%pK "
               "IsSystemInScanLearnMode:%d"), pMac->lim.gpLimSuspendCallback,
                pMac->lim.gLimSystemInScanLearnMode );
       callback( pMac, eHAL_STATUS_FAILURE, data ); 
@@ -3849,7 +3849,7 @@ tLimMlmRemoveKeyCnf  mlmRemoveKeyCnf;
     * peer entity for which keys need to be removed.
     */
   pStaDs = dphLookupHashEntry( pMac, pMlmRemoveKeyReq->peerMacAddr, &aid, &psessionEntry->dph.dphHashTable );
-    if ((pStaDs == NULL) ||
+  if ((pStaDs == NULL) ||
          (pStaDs &&
          (pStaDs->mlmStaContext.mlmState !=
                        eLIM_MLM_LINK_ESTABLISHED_STATE)))
@@ -3868,9 +3868,9 @@ tLimMlmRemoveKeyCnf  mlmRemoveKeyCnf;
       mlmRemoveKeyCnf.sessionId = pMlmRemoveKeyReq->sessionId;
       
 
-    goto end;
+      goto end;
   }
-    else
+  else
     staIdx = pStaDs->staIndex;
   
 
@@ -3923,7 +3923,7 @@ limProcessMinChannelTimeout(tpAniSirGlobal pMac)
     if((psessionEntry = peFindSessionBySessionId(pMac, pMac->lim.limTimers.gLimMinChannelTimer.sessionId))== NULL) 
     {
         limLog(pMac, LOGP,FL("Session Does not exist for given sessionID"));
-    return;
+        return;
     }
 #endif
 
