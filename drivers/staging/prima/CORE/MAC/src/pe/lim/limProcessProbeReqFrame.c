@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2015 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2015, 2018 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -167,14 +167,14 @@ void limRemovePBCSessions(tpAniSirGlobal pMac, tSirMacAddr pRemoveMac,tpPESessio
     tSirWPSPBCSession *pbc, *prev = NULL;
     prev = pbc = psessionEntry->pAPWPSPBCSession;
 
-        while (pbc) {
+    while (pbc) {
         if (vos_mem_compare((tANI_U8 *)pbc->addr,
                             (tANI_U8 *)pRemoveMac, sizeof(tSirMacAddr))) {
-        prev->next = pbc->next;
-        if (pbc == psessionEntry->pAPWPSPBCSession)
-        psessionEntry->pAPWPSPBCSession = pbc->next;
-        vos_mem_free(pbc);
-        return;
+          prev->next = pbc->next;
+          if (pbc == psessionEntry->pAPWPSPBCSession)
+            psessionEntry->pAPWPSPBCSession = pbc->next;
+            vos_mem_free(pbc);
+            return;
         }
         prev = pbc;
         pbc = pbc->next;
@@ -798,6 +798,10 @@ limSendSmeProbeReqInd(tpAniSirGlobal pMac,
 
     MTRACE(macTrace(pMac, TRACE_CODE_TX_SME_MSG, psessionEntry->peSessionId,
                                                                msgQ.type));
+
+    if (ProbeReqIELen > sizeof(pSirSmeProbeReqInd->WPSPBCProbeReq.probeReqIE))
+        ProbeReqIELen = sizeof(pSirSmeProbeReqInd->WPSPBCProbeReq.probeReqIE);
+
     pSirSmeProbeReqInd->WPSPBCProbeReq.probeReqIELen = (tANI_U16)ProbeReqIELen;
     vos_mem_copy(pSirSmeProbeReqInd->WPSPBCProbeReq.probeReqIE, pProbeReqIE, ProbeReqIELen);
     
