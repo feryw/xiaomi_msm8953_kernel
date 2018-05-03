@@ -390,8 +390,6 @@ static int get_v4l2_plane32(struct v4l2_plane __user *up,
 				sizeof(up->reserved)) ||
 		copy_in_user(&up->length, &up32->length,
 				sizeof(__u32)))
-	    copy_in_user(&up->data_offset, &up32->data_offset,
-			 sizeof(up->data_offset)))
 		return -EFAULT;
 
 	switch (memory) {
