@@ -80,7 +80,7 @@ struct gf_key_map key_map[] = {
 };
 
 /**************************debug******************************/
-#undef GF_DEBUG
+#define GF_DEBUG
 
 #ifdef GF_DEBUG
 #define gf_dbg(fmt, args...) do { \
