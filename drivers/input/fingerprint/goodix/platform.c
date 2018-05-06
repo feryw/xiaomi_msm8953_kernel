@@ -72,7 +72,6 @@ int gf_parse_dts(struct gf_dev *gf_dev)
 
 	/*get reset resource*/
 	rc = gf3208_request_named_gpio(gf_dev, "goodix,gpio_reset", &gf_dev->reset_gpio);
-	rc = gf3208_request_named_gpio(gf_dev, "goodix, gpio_reset", &gf_dev->reset_gpio);
 	if (rc) {
 		gf_dbg("Failed to request RESET GPIO. rc = %d\n", rc);
 		return -EPERM;
@@ -92,8 +91,6 @@ int gf_parse_dts(struct gf_dev *gf_dev)
 		const char *n = pctl_names[i];
 		struct pinctrl_state *state =
 			pinctrl_lookup_state(gf_dev->fingerprint_pinctrl, n);
-=======
-	rc = gf3208_request_named_gpio(gf_dev, "goodix, gpio_irq", &gf_dev->irq_gpio);
 	if (rc) {
 		gf_dbg("Failed to request IRQ GPIO. rc = %d\n", rc);
 		return -EPERM;
