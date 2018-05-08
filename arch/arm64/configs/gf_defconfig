@@ -322,6 +322,7 @@ CONFIG_PCI_LABEL=y
 # CONFIG_PCIEASPM_PERFORMANCE is not set
 # CONFIG_HOTPLUG_PCI is not set
 # Kernel Features
+CONFIG_BOEFFLA_WL_BLOCKER=y
 # ARM errata workarounds via the alternatives framework
 CONFIG_ARM64_ERRATUM_826319=y
 CONFIG_ARM64_ERRATUM_827319=y
