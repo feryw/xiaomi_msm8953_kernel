@@ -728,4 +728,3 @@ static void __exit kcal_ctrl_exit(void)
 
 late_initcall(kcal_ctrl_init);
 module_exit(kcal_ctrl_exit);
->>>>>>> 144d7613f7d7... mdss mdp: kcal for mdss_mdp_v1_7
