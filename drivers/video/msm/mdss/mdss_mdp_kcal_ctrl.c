@@ -347,8 +347,6 @@ static ssize_t kcal_show(struct device *dev, struct device_attribute *attr,
 {
 	struct kcal_lut_data *lut_data = dev_get_drvdata(dev);
 
-	mdss_mdp_kcal_read_pcc(lut_data);
-
 	return scnprintf(buf, PAGE_SIZE, "%d %d %d\n",
 		lut_data->red, lut_data->green, lut_data->blue);
 }
