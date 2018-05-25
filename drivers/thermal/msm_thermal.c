@@ -159,6 +159,7 @@ static bool ocr_nodes_called;
 static bool ocr_probed;
 static bool ocr_reg_init_defer;
 static bool hotplug_enabled;
+static bool interrupt_mode_enable;
 static bool msm_thermal_probed;
 static bool gfx_crit_phase_ctrl_enabled;
 static bool gfx_warm_phase_ctrl_enabled;
@@ -4691,6 +4692,7 @@ static void __ref disable_msm_thermal(void)
 static void interrupt_mode_init(void)
 {
 	if (!msm_thermal_probed)
+                interrupt_mode_enable = true;
 		return;
 
 	if (polling_enabled) {
