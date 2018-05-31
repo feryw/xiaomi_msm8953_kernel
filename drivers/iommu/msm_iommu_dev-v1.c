@@ -617,7 +617,10 @@ static int msm_iommu_ctx_parse_dt(struct platform_device *pdev,
 
 	if (!of_get_property(pdev->dev.of_node, "qcom,iommu-sid-mask",
 						&n_sid_mask)) {
+		__diag_push();
+		__diag_ignore(GCC_7, "-Wmemset-elt-size");
 		memset(ctx_drvdata->sid_mask, 0, MAX_NUM_SMR);
+		__diag_pop();
 		goto out;
 	}
 
