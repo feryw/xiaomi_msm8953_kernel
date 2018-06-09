@@ -120,9 +120,6 @@ static unsigned int __do_compat_ioctl_nr(unsigned int cmd32)
 static void  __copy_atomic_commit_struct(struct mdp_layer_commit  *commit,
 	struct mdp_layer_commit32 *commit32)
 {
-	unsigned int destSize = sizeof(commit->commit_v1.reserved);
-	unsigned int srcSize = sizeof(commit32->commit_v1.reserved);
-	unsigned int count = (destSize <= srcSize ? destSize : srcSize);
 	unsigned int destsize = sizeof(commit->commit_v1.reserved);
 	unsigned int srcsize = sizeof(commit32->commit_v1.reserved);
 	unsigned int count = (destsize <= srcsize ? destsize : srcsize);
