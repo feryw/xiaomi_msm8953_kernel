@@ -25,7 +25,7 @@ struct ktrace_event {
 
 };
 
-static const char const *event_str[KTRACE_EVENT_NR] = {
+static const char *event_str[KTRACE_EVENT_NR] = {
 	"event-1",
 	"event-2",
 	"event-3",
