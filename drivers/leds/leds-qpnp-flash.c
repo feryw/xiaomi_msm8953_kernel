@@ -226,7 +226,6 @@ struct flash_led_platform_data {
 };
 
 struct qpnp_flash_led_buffer {
-<<<<<<< HEAD
 	struct		mutex debugfs_lock; /* Prevent thread concurrency */
 	size_t		rpos;
 	size_t		wpos;
@@ -234,13 +233,6 @@ struct qpnp_flash_led_buffer {
 	struct		qpnp_flash_led *led;
 	u32		buffer_cnt;
 	char		data[0];
-=======
-	struct mutex debugfs_lock; /* Prevent thread concurrency */
-	size_t rpos;
-	size_t wpos;
-	size_t len;
-	char data[0];
->>>>>>> e12ec432a9ef... Kernel: Xiaomi kernel changes for Redmi note4X
 };
 
 /*
@@ -291,11 +283,7 @@ static int flash_led_dbgfs_file_open(struct qpnp_flash_led *led,
 	log->wpos = 0;
 	log->len = logbufsize - sizeof(*log);
 	mutex_init(&log->debugfs_lock);
-<<<<<<< HEAD
 	log->led = led;
-=======
-	led->log = log;
->>>>>>> e12ec432a9ef... Kernel: Xiaomi kernel changes for Redmi note4X
 
 	log->buffer_cnt = 1;
 	file->private_data = log;
@@ -316,13 +304,8 @@ static int flash_led_dfs_close(struct inode *inode, struct file *file)
 
 	if (log) {
 		file->private_data = NULL;
-<<<<<<< HEAD
 		mutex_destroy(&log->debugfs_lock);
 		kfree(log);
-=======
-		mutex_destroy(&led->log->debugfs_lock);
-		kfree(led->log);
->>>>>>> e12ec432a9ef... Kernel: Xiaomi kernel changes for Redmi note4X
 	}
 
 	return 0;
@@ -358,7 +341,6 @@ static ssize_t flash_led_dfs_latched_reg_read(struct file *fp, char __user *buf,
 	size_t len;
 	size_t ret;
 
-<<<<<<< HEAD
 	if (!log) {
 		pr_err("error: file private data is NULL\n");
 		return -EFAULT;
@@ -367,10 +349,6 @@ static ssize_t flash_led_dfs_latched_reg_read(struct file *fp, char __user *buf,
 
 	mutex_lock(&log->debugfs_lock);
 	if ((log->rpos >= log->wpos && log->buffer_cnt == 0) ||
-=======
-	mutex_lock(&log->debugfs_lock);
-	if ((log->rpos >= log->wpos && led->buffer_cnt == 0) ||
->>>>>>> e12ec432a9ef... Kernel: Xiaomi kernel changes for Redmi note4X
 			((log->len - log->wpos) < MIN_BUFFER_WRITE_LEN))
 		goto unlock_mutex;
 
@@ -417,18 +395,12 @@ unlock_mutex:
 
 static ssize_t flash_led_dfs_fault_reg_read(struct file *fp, char __user *buf,
 					size_t count, loff_t *ppos) {
-<<<<<<< HEAD
 	struct qpnp_flash_led_buffer *log = fp->private_data;
 	struct qpnp_flash_led *led;
-=======
-	struct qpnp_flash_led *led = fp->private_data;
-	struct qpnp_flash_led_buffer *log = led->log;
->>>>>>> e12ec432a9ef... Kernel: Xiaomi kernel changes for Redmi note4X
 	int rc = 0;
 	size_t len;
 	size_t ret;
 
-<<<<<<< HEAD
 	if (!log) {
 		pr_err("error: file private data is NULL\n");
 		return -EFAULT;
@@ -437,10 +409,6 @@ static ssize_t flash_led_dfs_fault_reg_read(struct file *fp, char __user *buf,
 
 	mutex_lock(&log->debugfs_lock);
 	if ((log->rpos >= log->wpos && log->buffer_cnt == 0) ||
-=======
-	mutex_lock(&log->debugfs_lock);
-	if ((log->rpos >= log->wpos && led->buffer_cnt == 0) ||
->>>>>>> e12ec432a9ef... Kernel: Xiaomi kernel changes for Redmi note4X
 			((log->len - log->wpos) < MIN_BUFFER_WRITE_LEN))
 		goto unlock_mutex;
 
@@ -486,7 +454,6 @@ static ssize_t flash_led_dfs_fault_reg_enable(struct file *file,
 	int data;
 	size_t ret = 0;
 
-<<<<<<< HEAD
 	struct qpnp_flash_led_buffer *log = file->private_data;
 	struct qpnp_flash_led *led;
 	char *kbuf;
@@ -498,12 +465,6 @@ static ssize_t flash_led_dfs_fault_reg_enable(struct file *file,
 	led = log->led;
 
 	mutex_lock(&log->debugfs_lock);
-=======
-	struct qpnp_flash_led *led = file->private_data;
-	char *kbuf;
-
-	mutex_lock(&led->log->debugfs_lock);
->>>>>>> e12ec432a9ef... Kernel: Xiaomi kernel changes for Redmi note4X
 	kbuf = kmalloc(count + 1, GFP_KERNEL);
 	if (!kbuf) {
 		ret = -ENOMEM;
@@ -538,11 +499,7 @@ static ssize_t flash_led_dfs_fault_reg_enable(struct file *file,
 free_buf:
 	kfree(kbuf);
 unlock_mutex:
-<<<<<<< HEAD
 	mutex_unlock(&log->debugfs_lock);
-=======
-	mutex_unlock(&led->log->debugfs_lock);
->>>>>>> e12ec432a9ef... Kernel: Xiaomi kernel changes for Redmi note4X
 	return ret;
 }
 
@@ -554,7 +511,6 @@ static ssize_t flash_led_dfs_dbg_enable(struct file *file,
 	int cnt = 0;
 	int data;
 	size_t ret = 0;
-<<<<<<< HEAD
 	struct qpnp_flash_led_buffer *log = file->private_data;
 	struct qpnp_flash_led *led;
 	char *kbuf;
@@ -566,12 +522,6 @@ static ssize_t flash_led_dfs_dbg_enable(struct file *file,
 	led = log->led;
 
 	mutex_lock(&log->debugfs_lock);
-=======
-	struct qpnp_flash_led *led = file->private_data;
-	char *kbuf;
-
-	mutex_lock(&led->log->debugfs_lock);
->>>>>>> e12ec432a9ef... Kernel: Xiaomi kernel changes for Redmi note4X
 	kbuf = kmalloc(count + 1, GFP_KERNEL);
 	if (!kbuf) {
 		ret = -ENOMEM;
@@ -605,11 +555,7 @@ static ssize_t flash_led_dfs_dbg_enable(struct file *file,
 free_buf:
 	kfree(kbuf);
 unlock_mutex:
-<<<<<<< HEAD
 	mutex_unlock(&log->debugfs_lock);
-=======
-	mutex_unlock(&led->log->debugfs_lock);
->>>>>>> e12ec432a9ef... Kernel: Xiaomi kernel changes for Redmi note4X
 	return ret;
 }
 
