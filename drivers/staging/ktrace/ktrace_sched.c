@@ -86,7 +86,7 @@ static struct ktrace_sched __ks = {
 
 };
 
-static const char const *sched_event_name[KTRACE_SCHED_TYPE_NR] = {
+static const char *sched_event_name[KTRACE_SCHED_TYPE_NR] = {
 	"sam_1",
 	"sam_2",
 	"sam_3",
