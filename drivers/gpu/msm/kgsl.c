@@ -257,8 +257,6 @@ kgsl_mem_entry_create(void)
 		kref_get(&entry->refcount);
 	}
 
-		kref_get(&entry->refcount);
-	}
 	return entry;
 }
 #ifdef CONFIG_DMA_SHARED_BUFFER
