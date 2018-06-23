@@ -32,6 +32,7 @@
 #include <linux/mutex.h>
 #include <linux/shmem_fs.h>
 #include <linux/ashmem.h>
+#include <asm/cacheflush.h>
 
 #include "ashmem.h"
 
