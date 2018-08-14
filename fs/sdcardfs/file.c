@@ -18,7 +18,6 @@
  * General Public License.
  */
 
-#include <linux/fsnotify.h>
 #include "sdcardfs.h"
 #ifdef CONFIG_SDCARD_FS_FADV_NOACTIVE
 #include <linux/backing-dev.h>
@@ -105,19 +104,12 @@ static long sdcardfs_unlocked_ioctl(struct file *file, unsigned int cmd,
 {
 	long err = -ENOTTY;
 	struct file *lower_file;
-	const struct cred *saved_cred = NULL;
-	struct dentry *dentry = file->f_path.dentry;
-	struct sdcardfs_sb_info *sbi = SDCARDFS_SB(dentry->d_sb);
 
 	lower_file = sdcardfs_lower_file(file);
 
 	/* XXX: use vfs_ioctl if/when VFS exports it */
 	if (!lower_file || !lower_file->f_op)
 		goto out;
-
-	/* save current_cred and override it */
-	OVERRIDE_CRED(sbi, saved_cred, SDCARDFS_I(file_inode(file)));
-
 	if (lower_file->f_op->unlocked_ioctl)
 		err = lower_file->f_op->unlocked_ioctl(lower_file, cmd, arg);
 
@@ -137,23 +129,15 @@ static long sdcardfs_compat_ioctl(struct file *file, unsigned int cmd,
 {
 	long err = -ENOTTY;
 	struct file *lower_file;
-	const struct cred *saved_cred = NULL;
-	struct dentry *dentry = file->f_path.dentry;
-	struct sdcardfs_sb_info *sbi = SDCARDFS_SB(dentry->d_sb);
 
 	lower_file = sdcardfs_lower_file(file);
 
 	/* XXX: use vfs_ioctl if/when VFS exports it */
 	if (!lower_file || !lower_file->f_op)
 		goto out;
-
-	/* save current_cred and override it */
-	OVERRIDE_CRED(sbi, saved_cred, SDCARDFS_I(file_inode(file)));
-
 	if (lower_file->f_op->compat_ioctl)
 		err = lower_file->f_op->compat_ioctl(lower_file, cmd, arg);
 
-	REVERT_CRED(saved_cred);
 out:
 	return err;
 }
@@ -261,13 +245,12 @@ static int sdcardfs_open(struct inode *inode, struct file *file)
 			fput(lower_file); /* fput calls dput for lower_dentry */
 		}
 	} else {
-		fsnotify_open(lower_file);
 		sdcardfs_set_lower_file(file, lower_file);
 	}
 
 	if (err)
 		kfree(SDCARDFS_F(file));
-	else
+	else {
 		sdcardfs_copy_and_fix_attrs(inode, sdcardfs_lower_inode(inode));
 		fsstack_copy_inode_size(inode, sdcardfs_lower_inode(inode));
 	}
@@ -362,9 +345,6 @@ out:
 	return err;
 }
 
-/*
- * Sdcardfs read_iter, redirect modified iocb to lower read_iter
- */
 ssize_t sdcardfs_read_iter(struct kiocb *iocb, struct iov_iter *iter)
 {
 	int err;
@@ -376,22 +356,19 @@ ssize_t sdcardfs_read_iter(struct kiocb *iocb, struct iov_iter *iter)
 		goto out;
 	}
 
-	get_file(lower_file); /* prevent lower_file from being released */
+	get_file(lower_file);
 	iocb->ki_filp = lower_file;
 	err = lower_file->f_op->read_iter(iocb, iter);
 	iocb->ki_filp = file;
 	fput(lower_file);
-	/* update upper inode atime as needed */
+
 	if (err >= 0 || err == -EIOCBQUEUED)
 		fsstack_copy_attr_atime(file->f_path.dentry->d_inode,
-					file_inode(lower_file));
+				file_inode(lower_file));
 out:
 	return err;
 }
 
-/*
- * Sdcardfs write_iter, redirect modified iocb to lower write_iter
- */
 ssize_t sdcardfs_write_iter(struct kiocb *iocb, struct iov_iter *iter)
 {
 	int err;
@@ -403,17 +380,17 @@ ssize_t sdcardfs_write_iter(struct kiocb *iocb, struct iov_iter *iter)
 		goto out;
 	}
 
-	get_file(lower_file); /* prevent lower_file from being released */
+	get_file(lower_file);
 	iocb->ki_filp = lower_file;
 	err = lower_file->f_op->write_iter(iocb, iter);
 	iocb->ki_filp = file;
 	fput(lower_file);
-	/* update upper inode times/sizes as needed */
+
 	if (err >= 0 || err == -EIOCBQUEUED) {
 		fsstack_copy_inode_size(file->f_path.dentry->d_inode,
-					file_inode(lower_file));
+				file_inode(lower_file));
 		fsstack_copy_attr_times(file->f_path.dentry->d_inode,
-					file_inode(lower_file));
+				file_inode(lower_file));
 	}
 out:
 	return err;

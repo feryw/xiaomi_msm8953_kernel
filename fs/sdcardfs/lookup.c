@@ -41,8 +41,6 @@ void sdcardfs_destroy_dentry_cache(void)
 
 void free_dentry_private_data(struct dentry *dentry)
 {
-	if (!dentry || !dentry->d_fsdata)
-		return;
 	kmem_cache_free(sdcardfs_dentry_cachep, dentry->d_fsdata);
 	dentry->d_fsdata = NULL;
 }
@@ -293,42 +291,6 @@ static struct dentry *__sdcardfs_lookup(struct dentry *dentry,
 	/* Use vfs_path_lookup to check if the dentry exists or not */
 	err = vfs_path_lookup(lower_dir_dentry, lower_dir_mnt, name->name, 0,
 				&lower_path);
-	/* check for other cases */
-	if (err == -ENOENT) {
-		struct file *file;
-		const struct cred *cred = current_cred();
-
-		struct sdcardfs_name_data buffer = {
-			.ctx.actor = sdcardfs_name_match,
-			.to_find = name,
-			.name = __getname(),
-			.found = false,
-		};
-
-		if (!buffer.name) {
-			err = -ENOMEM;
-			goto out;
-		}
-		file = dentry_open(lower_parent_path, O_RDONLY, cred);
-		if (IS_ERR(file)) {
-			err = PTR_ERR(file);
-			goto put_name;
-		}
-		err = iterate_dir(file, &buffer.ctx);
-		fput(file);
-		if (err)
-			goto put_name;
-
-		if (buffer.found)
-			err = vfs_path_lookup(lower_dir_dentry,
-						lower_dir_mnt,
-						buffer.name, 0,
-						&lower_path);
-		else
-			err = -ENOENT;
-put_name:
-		__putname(buffer.name);
-	}
 
 	if (err == -ENOENT) {
 		struct file *file;

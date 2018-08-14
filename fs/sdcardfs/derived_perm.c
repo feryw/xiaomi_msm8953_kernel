@@ -310,8 +310,6 @@ static void __fixup_perms_recursive(struct dentry *dentry, struct limit_search *
 		list_for_each_entry(child, &dentry->d_subdirs, d_child) {
 			__fixup_perms_recursive(child, limit, depth + 1);
 		}
-		if (error)
-			pr_debug("sdcardfs: Failed to touch up lower fs gid/uid for %s\n", name);
 	}
 	spin_unlock(&dentry->d_lock);
 }
