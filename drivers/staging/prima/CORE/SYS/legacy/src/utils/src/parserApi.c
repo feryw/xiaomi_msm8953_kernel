@@ -2084,7 +2084,7 @@ tSirRetStatus ValidateAndRectifyIEs(tpAniSirGlobal pMac,
                                     tANI_U32 *nMissingRsnBytes)
 {
     tANI_U32 length = SIZE_OF_FIXED_PARAM;
-    tANI_U8 *refFrame;
+    tANI_U8 *refFrame = NULL;
 
     // Frame contains atleast one IE
     if (nFrameBytes > (SIZE_OF_FIXED_PARAM + 2))
