@@ -786,44 +786,8 @@ binder_enqueue_work_ilocked(struct binder_work *work,
 }
 
 /**
- * binder_enqueue_thread_work_ilocked_nowake() - Add thread work
- * @thread:       thread to queue work to
- * @work:         struct binder_work to add to list
- *
- * Adds the work to the todo list of the thread. Doesn't set the process_todo
- * flag, which means that (if it wasn't already set) the thread will go to
- * sleep without handling this work when it calls read.
- *
- * Requires the proc->inner_lock to be held.
- */
-static void
-binder_enqueue_thread_work_ilocked_nowake(struct binder_thread *thread,
-					  struct binder_work *work)
-{
-	binder_enqueue_work_ilocked(work, &thread->todo);
-}
-
-/**
- * binder_enqueue_thread_work_ilocked() - Add an item to the thread work list
- * @thread:       thread to queue work to
- * @work:         struct binder_work to add to list
- *
- * Adds the work to the todo list of the thread, and enables processing
- * of the todo queue.
- *
- * Requires the proc->inner_lock to be held.
- */
-static void
-binder_enqueue_thread_work_ilocked(struct binder_thread *thread,
-				   struct binder_work *work)
-{
-	binder_enqueue_work_ilocked(work, &thread->todo);
-	thread->process_todo = true;
-}
-
-/**
- * binder_enqueue_thread_work() - Add an item to the thread work list
- * @thread:       thread to queue work to
+ * binder_enqueue_work() - Add an item to the work list
+ * @proc:         binder_proc associated with list
  * @work:         struct binder_work to add to list
  * @target_list:  list to add work to
  *
@@ -3279,7 +3243,6 @@ static void binder_transaction(struct binder_proc *proc,
 	} else if (!(t->flags & TF_ONE_WAY)) {
 		BUG_ON(t->buffer->async_transaction != 0);
 		binder_inner_proc_lock(proc);
-		binder_enqueue_thread_work_ilocked_nowake(thread, tcomplete);
 		t->need_reply = 1;
 		t->from_parent = thread->transaction_stack;
 		thread->transaction_stack = t;
