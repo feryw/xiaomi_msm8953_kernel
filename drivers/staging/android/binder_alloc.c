@@ -212,8 +212,8 @@ static int binder_update_page_range(struct binder_alloc *alloc, int allocate,
 		}
 	}
 
-	if (need_mm && atomic_inc_not_zero(&alloc->vma_vm_mm->mm_users))
-		mm = alloc->vma_vm_mm;
+	if (need_mm)
+		mm = get_task_mm(alloc->tsk);
 
 	if (mm) {
 		down_write(&mm->mmap_sem);
