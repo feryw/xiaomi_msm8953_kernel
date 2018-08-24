@@ -212,9 +212,8 @@ static int binder_update_page_range(struct binder_alloc *alloc, int allocate,
 		}
 	}
 
-	/* Same as mmget_not_zero() in later kernel versions */
-	if (need_mm && atomic_inc_not_zero(&alloc->vma_vm_mm->mm_users))
-		mm = alloc->vma_vm_mm;
+	if (need_mm)
+		mm = get_task_mm(alloc->tsk);
 
 	if (mm) {
 		down_write(&mm->mmap_sem);
@@ -699,8 +698,6 @@ int binder_alloc_mmap_handler(struct binder_alloc *alloc,
 	barrier();
 	alloc->vma = vma;
 	alloc->vma_vm_mm = vma->vm_mm;
-	/* Same as mmgrab() in later kernel versions */
-	atomic_inc(&alloc->vma_vm_mm->mm_count);
 
 	atomic_inc(&alloc->vma_vm_mm->mm_count);
 
@@ -901,7 +898,7 @@ enum lru_status binder_alloc_free_page(struct list_head *item,
 	page_addr = (uintptr_t)alloc->buffer + index * PAGE_SIZE;
 	vma = alloc->vma;
 	if (vma) {
-		/* Same as mmget_not_zero() in later kernel versions */
+
 		if (!atomic_inc_not_zero(&alloc->vma_vm_mm->mm_users))
 			goto err_mmget;
 		mm = alloc->vma_vm_mm;
